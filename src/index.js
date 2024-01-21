@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from "react-router-dom"; 
+import { HashRouter, Routes, Route } from "react-router-dom"; 
 import './index.css';
 import './reset.css';
 import App from './App';
@@ -12,7 +12,7 @@ import Signup from './Signup/Signup';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <BrowserRouter>
+  <HashRouter>
     <Routes>
       <Route path="/" element={<Login />}>
         <Route index element={<Login />} />
@@ -25,6 +25,6 @@ root.render(
         <Route path="image" element={<Images />} />
       </Route>
     </Routes>
-  </BrowserRouter>
+  </HashRouter>
 );
 
