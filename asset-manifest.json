@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/fullstack-note-app/static/css/main.e9d7ba07.css",
+    "main.js": "/fullstack-note-app/static/js/main.01cb258c.js",
+    "index.html": "/fullstack-note-app/index.html",
+    "main.e9d7ba07.css.map": "/fullstack-note-app/static/css/main.e9d7ba07.css.map",
+    "main.01cb258c.js.map": "/fullstack-note-app/static/js/main.01cb258c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e9d7ba07.css",
+    "static/js/main.01cb258c.js"
+  ]
+}
