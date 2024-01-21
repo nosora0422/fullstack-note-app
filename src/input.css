@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base{
+    html{
+        @apply m-0 p-0 box-border;    
+    }
+    body{
+        @apply font-Roboto mx-auto my-0 relative;
+    }
+    a{
+        @apply block no-underline -text--main-font-color;
+    }  
+}
+
+
+@layer components{
+    .my-grid{
+        @apply grid grid-cols-12 gap-4;
+    }
+    .container{
+        @apply py-4 px-6 mx-auto md:flex md:flex-col md:items-end md:max-w-screen-xl md:mx-auto md:p-8;
+    }
+    .mobile-nav-items-open{
+        @apply w-52 h-screen -bg--surface-container py-6 px-4 drop-shadow-2xl;
+    }
+    .mobile-nav-items{
+        @apply hidden;
+    }
+    .nav-item{
+        @apply py-3 px-4 rounded-full hover:-bg--surface-container-highest;
+    }
+    .nav-item-curr{
+        @apply py-3 px-4 rounded-full -text--on-primary -bg--primary;
+    }
+    .button{
+        @apply py-2 px-6 border-0 rounded-sm text-center;
+    }
+
+}
