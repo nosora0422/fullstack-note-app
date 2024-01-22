@@ -23,7 +23,7 @@
         @apply py-4 px-6 mx-auto md:flex md:flex-col md:items-end md:max-w-screen-xl md:mx-auto md:p-8;
     }
     .mobile-nav-items-open{
-        @apply w-52 h-screen -bg--surface-container py-6 px-4 drop-shadow-2xl;
+        @apply fixed top-0 left-0 z-10 w-52 h-screen -bg--surface-container py-6 px-4 drop-shadow-2xl;
     }
     .mobile-nav-items{
         @apply hidden;

@@ -37,7 +37,7 @@ export default function Signup(){
 
     return(
         <div className="grid grid-cols-12 h-screen m-0 p-6 -bg--surface-container-low">
-            <div className="col-span-12 md:col-start-4 md:col-end-10 w-full m-auto p-8 lg:p-24 rounded-lg bg-white drop-shadow-lg">
+            <div className="col-span-12 md:col-start-5 md:col-end-9 w-full m-auto p-8 lg:p-24 rounded-lg bg-white drop-shadow-lg">
                 <h1 className="text-2xl my-4 font-medium">Sign up</h1>
                 <div>
                     <div>
