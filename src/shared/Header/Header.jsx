@@ -4,30 +4,39 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faListCheck, faImages, faXmark, faPowerOff } from '@fortawesome/free-solid-svg-icons'
 import { faNoteSticky } from '@fortawesome/free-regular-svg-icons'
 import { useNavigate } from 'react-router-dom';
-import Axios from 'axios';
+import { auth } from "../../firebase.config";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 export default function Header(){
     const [isNavOpen, setIsNavOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
-    const navigate = useNavigate();
+    const [user, setUser] = useState({});
+
+    onAuthStateChanged(auth, (currentUser)=> {
+        setUser(currentUser);
+    })
+
+    const logout = async () => {
+        await signOut(auth)
+        navigate('/');
+    };
 
     const handleMNav = () => {
         setIsNavOpen(prev => !prev);
     }
-
-    const handleLogout = () => {
-        Axios.post('http://localhost:3001/logout')
-            .then((res) => {
-            if (res.data.status === 'Success') {
-                localStorage.removeItem('user');
-                setIsLoggedIn(false);
-                navigate('/');
-            } else {
-                alert('Logout failed');
-            }
-            })
-            .catch((err) => console.log('Error' + err));
-    };
+    const navigate = useNavigate();
+    // const handleLogout = () => {
+    //     Axios.post('http://localhost:3001/logout')
+    //         .then((res) => {
+    //         if (res.data.status === 'Success') {
+    //             localStorage.removeItem('user');
+    //             setIsLoggedIn(false);
+    //             navigate('/');
+    //         } else {
+    //             alert('Logout failed');
+    //         }
+    //         })
+    //         .catch((err) => console.log('Error' + err));
+    // };
 
     const cRoute = useLocation();
     return(
@@ -62,7 +71,7 @@ export default function Header(){
                         </li>
                     </ul>
                 </div>
-                {isLoggedIn ? (<button onClick={handleLogout}>Logout</button>) : <></>}
+                <button onClick={logout}>Logout</button>
             </nav>
             <nav className="hidden relative md:block h-screen py-10 px-4 -bg--surface-container drop-shadow-xl">
                 <h1 className="text-3xl mb-12">Note App</h1>
@@ -81,8 +90,9 @@ export default function Header(){
                         Images
                         </Link>
                     </li>
+                    <li>{user?.email}</li>
                 </ul>
-                {isLoggedIn ? (<button className="button absolute bottom-9 -text--main-font-color -bg--surface-container-highest" onClick={handleLogout}><FontAwesomeIcon icon={faPowerOff} className="mr-2" />Logout</button>) : <></>}
+                <button className="button absolute bottom-9 -text--main-font-color -bg--surface-container-highest" onClick={logout}><FontAwesomeIcon icon={faPowerOff} className="mr-2" />Logout</button>
             </nav>
         </header>
         </>
