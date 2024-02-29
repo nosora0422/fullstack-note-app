@@ -25,15 +25,15 @@ export default function Signup(){
             await updateProfile(user, { displayName: registerName });
             navigate('/');
             
-            console.log(user);
+            // console.log(user);
         } catch(error){
             setError(error.message);
-            console.log(error.message);
+            // console.log(error.message);
         }
     };
 
-    console.log(registerEmail);
-    console.log(registerPassword);
+    // console.log(registerEmail);
+    // console.log(registerPassword);
 
     return(
         <div className="grid grid-cols-12 h-screen m-0 p-6 -bg--surface-container-low">
@@ -64,27 +64,27 @@ export default function Signup(){
                                 }} 
                                 placeholder='youremail@example.com' 
                             />
-                            {/*error.email && <p className='text-xs text-red-400'>{error.email}</p>*/ }
+                            {error.email && <p className='text-xs text-red-400'>{error.email}</p>}
                         </div>
                         <div className='pt-4 flex flex-col'>
                             <label htmlFor='password'>Password</label>
                             <input 
                                 className="border border-solid -border--outline rounded py-2 px-3" 
                                 name="password"
-                                type='text'
+                                type='password'
                                 onChange={(event) => {
                                     setPassword(event.target.value)
                                 }} 
                                 placeholder='Your password' 
                             />
-                            {/*error.password && <p className='text-xs text-red-400'>{error.password}</p> */}
+                            {error.password && <p className='text-xs text-red-400'>{error.password}</p>}
                         </div>
                         <div className='py-4 flex flex-col'>
                             <label htmlFor='password'>Confirm Password</label>
                             <input 
                                 className="border border-solid -border--outline rounded py-2 px-3" 
                                 name="passwordConfirm"
-                                type='text'
+                                type='password'
                                 onChange={(event) => {
                                         setRegisterPassword(event.target.value)
                                 }}

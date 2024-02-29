@@ -24,8 +24,8 @@ export default function Login(){
     
     return(
         <div>
-            <div className="grid grid-cols-12 h-screen m-0 p-6 -bg--surface-container-low">
-                <div className='col-span-12 md:col-start-5 md:col-end-9 w-full m-auto p-8 lg:p-24 rounded-lg bg-white drop-shadow-lg'>
+            <div className="flex items-center justify-center h-screen m-0 p-6 -bg--surface-container-low">
+                <div className='w-full md:min-w-[500px] md:w-3/5 lg:w-2/6 p-8 lg:p-24 rounded-lg bg-white drop-shadow-lg'>
                     <h1 className="text-2xl mb-8 font-medium">Login</h1>
                     <div>
                         <div>
@@ -47,7 +47,7 @@ export default function Login(){
                                     name='password'
                                     type='password'
                                     onChange={(event)=>{setLoginPassword(event.target.value)}} 
-                                    placeholder='Your password' 
+                                    placeholder='Your password'
                                 />
                                 {error && <p className='text-xs text-red-400'>{error}</p> }
                             </div>

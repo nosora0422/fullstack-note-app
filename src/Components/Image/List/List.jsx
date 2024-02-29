@@ -88,6 +88,7 @@ export default function ImageList({ searchTerm }) {
                   hidden
                 />
                 <input
+                  className="w-full mx-auto px-4"
                   type="file"
                   accept="image/png, image/jpg, image/webp, image/jpeg, image/gif, image/svg"
                   onChange={(event) => {

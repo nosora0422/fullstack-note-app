@@ -15,6 +15,7 @@ module.exports = {
         '--on-primary-container': '#052100',
         '--secondary': '#55624C',
         '--outline': '#73796E',
+        '--outline-variation': '#C3C8BB',
         '--tertiary': '#386667',
         '--tertiary-container': '#BBEBEC',
         '--surface-bright':'#F8FAF0',
@@ -23,7 +24,8 @@ module.exports = {
         '--search-bar': '#F2F2F2'
       },
       fontFamily: {
-        Roboto: ['"Roboto"', ...defaultTheme.fontFamily.sans]
+        Roboto: ['"Roboto"', ...defaultTheme.fontFamily.sans],
+        Quicksand: ['"Quicksand"', ...defaultTheme.fontFamily.sans]
       }
     },
   },

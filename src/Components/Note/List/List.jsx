@@ -80,7 +80,7 @@ export default function List({ searchTerm }){
                             </div>
                             <div className="iflex items-center bg-white rounded-sm">
                                 <textarea
-                                    className="w-full py-2 px-4 border-none rounded-sm focus: outline-0 font-Roboto h-72"
+                                    className="w-full py-2 px-4 border-none rounded-sm focus: outline-0 font-Roboto h-52"
                                     value={textVal}
                                     onChange={(event) => {setTextVal(event.target.value);
                                     }}

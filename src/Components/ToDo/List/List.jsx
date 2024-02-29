@@ -114,13 +114,17 @@ export default function List({ searchTerm }){
                                         placeholder="Enter Task"
                                     />
                                     {index > 0 && (
-                                        <button className="p-2 border-0 bg-transparent cursor-pointer" onClick={() => removeTaskInput(index)}><FontAwesomeIcon icon={faTrashCan} /></button>
+                                        <button 
+                                            className="p-2 border-0 bg-transparent cursor-pointer" 
+                                            onClick={() => removeTaskInput(index)}
+                                        ><FontAwesomeIcon icon={faTrashCan} />
+                                        </button>
                                     )}
                                 </div>
                             ))}
                             <button 
                                 type="submit"
-                                className="button mt-2 -bg--surface-container-highest -text--on-primary-container"
+                                className="button rounded-sm mt-2 -bg--surface-container-highest -text--on-primary-container"
                                 onClick={addTaskInput}
                             >
                             <FontAwesomeIcon icon={faPlus} /> Add Task

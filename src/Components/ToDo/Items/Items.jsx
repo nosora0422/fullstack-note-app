@@ -16,7 +16,7 @@ export default function ToDoItems({ entries, delRef }){
 
     return(
         <div>
-            <div className="flex justify-end flex-wrap px-2 py-4">
+            <div className="flex justify-end flex-wrap px-2 py-3">
                 <div className="mb-2">
                     <ButtonGroup 
                         validList={filterList} 
@@ -60,16 +60,16 @@ function Task({ item, delRef }){
                 {retDateString(item.date)}
             </div>
             <div className="flex justify-between items-center">
-                <p className="inlint-block py-2 px-4 text-xs rounded-full -text--on-primary -bg--secondary">{item.category}</p>
+                <p className="inlint-block py-2 px-4 text-xs rounded-full -text--on-primary-container -bg--primary-container">{item.category}</p>
                 <button
-                type="button"
-                className="p-2 border-0 bg-transparent cursor-pointer"
-                onClick={() => delRef(item.id)}
+                    type="button"
+                    className="p-2 border-0 bg-transparent cursor-pointer"
+                    onClick={() => delRef(item.id)}
                 >
                 <FontAwesomeIcon icon={faTrashCan} />
                 </button>
             </div>
-            <h2 className="font-bold">{item.title}</h2>
+            <h2 className="font-medium text-xl">{item.title}</h2>
             <ul>
             {/*display tasks by mapping values in tasks array*/} 
             {item.tasks.map((task, index) => (
