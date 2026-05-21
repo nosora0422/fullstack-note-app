@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faListCheck, faImages, faXmark, faPowerOff } from '@fortawesome/free-solid-svg-icons'
+import { faBars, faListCheck, faImages, faXmark, faPowerOff, faGear } from '@fortawesome/free-solid-svg-icons'
 import { faNoteSticky } from '@fortawesome/free-regular-svg-icons'
 import { useNavigate } from 'react-router-dom';
 import { auth } from "../../firebase.config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { clearAppMode, clearGuestData, getAppMode } from "../../utils/storage";
 
 export default function Header(){
     const [isNavOpen, setIsNavOpen] = useState(false);
@@ -19,13 +20,19 @@ export default function Header(){
         return () => unsubscribe();
     }, []);
 
-    onAuthStateChanged(auth, (currentUser)=> {
-        setUser(currentUser);
-    })
-
     const logout = async () => {
-        await signOut(auth)
-        navigate('/');
+        const isGuest = cRoute.pathname.startsWith('/guest') || getAppMode() === "guest";
+
+        if (isGuest) {
+            clearGuestData();
+            clearAppMode();
+            navigate('/login');
+            return;
+        }
+
+        await signOut(auth);
+        clearAppMode();
+        navigate('/login');
     };
 
     const handleMNav = () => {
@@ -33,6 +40,10 @@ export default function Header(){
     }
     
     const cRoute = useLocation();
+    const navBase = cRoute.pathname.startsWith('/guest') || getAppMode() === "guest" ? "/guest" : "/app";
+    const todosPath = `${navBase}/todos`;
+    const notesPath = `${navBase}/notes`;
+    const imagesPath = `${navBase}/images`;
     return(
         <>
         <header>
@@ -46,19 +57,24 @@ export default function Header(){
                             <FontAwesomeIcon icon={faXmark} />
                         </li> */}
                         <li>
-                            <Link to="/app/to-do-list" className={(cRoute.pathname === '/app' || cRoute.pathname === '/app/to-do-list') ? 'nav-item-curr' : 'nav-item'}>      
+                            <Link to={todosPath} className={(cRoute.pathname === '/app' || cRoute.pathname.endsWith('/todos')) ? 'nav-item-curr' : 'nav-item'}>      
                             <FontAwesomeIcon icon={faListCheck} className="mr-3"/>
                             To Do List
                             </Link>
                         </li>
                         <li>
-                            <Link to="/app/note" className={(cRoute.pathname === '/app/note') ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faNoteSticky} className="mr-3"/>
+                            <Link to={notesPath} className={(cRoute.pathname.endsWith('/notes')) ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faNoteSticky} className="mr-3"/>
                             Note
                             </Link>
                         </li>
                         <li>
-                            <Link to="/app/image" className={(cRoute.pathname === '/app/image') ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faImages}className="mr-3"/>
+                            <Link to={imagesPath} className={(cRoute.pathname.endsWith('/images')) ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faImages}className="mr-3"/>
                             Images
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/settings" className={(cRoute.pathname === '/settings') ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faGear} className="mr-3"/>
+                            Settings
                             </Link>
                         </li>
                         <button 
@@ -76,17 +92,22 @@ export default function Header(){
                 <h1 className="text-3xl mb-10">Note App</h1>
                 <ul className="flex flex-col justify-between h-40">
                     <li>
-                        <Link to="/app/to-do-list" className={(cRoute.pathname === '/app' || cRoute.pathname === '/app/to-do-list') ? 'nav-item-curr' : 'nav-item'}><FontAwesomeIcon icon={faListCheck} className="mr-2"/>To Do List
+                        <Link to={todosPath} className={(cRoute.pathname === '/app' || cRoute.pathname.endsWith('/todos')) ? 'nav-item-curr' : 'nav-item'}><FontAwesomeIcon icon={faListCheck} className="mr-2"/>To Do List
                         </Link>
                     </li>
                     <li>
-                        <Link to="/app/note" className={(cRoute.pathname === '/app/note') ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faNoteSticky} className="mr-2"/>
+                        <Link to={notesPath} className={(cRoute.pathname.endsWith('/notes')) ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faNoteSticky} className="mr-2"/>
                         Note
                         </Link>
                     </li>
                     <li>
-                        <Link to="/app/image" className={(cRoute.pathname === '/app/image') ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faImages}className="mr-2"/>
+                        <Link to={imagesPath} className={(cRoute.pathname.endsWith('/images')) ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faImages}className="mr-2"/>
                         Images
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/settings" className={(cRoute.pathname === '/settings') ? 'nav-item-curr' : 'nav-item'}> <FontAwesomeIcon icon={faGear}className="mr-2"/>
+                        Settings
                         </Link>
                     </li>
                 </ul>

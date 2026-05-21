@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase.config';
+import { setAppMode } from '../utils/storage';
+import SignupValidation from '../SignupValidation';
+import { getFirebaseAuthErrorMessage, hasValidationErrors } from '../utils/authErrors';
 
 
 export default function Signup(){
@@ -10,24 +13,37 @@ export default function Signup(){
     const [password, setPassword] = useState("");
     const [registerPassword, setRegisterPassword] = useState("");
     const [registerName, setRegisterName] = useState("");
-    const [error, setError] = useState("");
+    const [error, setError] = useState({});
     const navigate = useNavigate();
 
     const register = async () => {
+        const validationErrors = SignupValidation({
+            name: registerName,
+            email: registerEmail,
+            password,
+        });
+
         if (password !== registerPassword) {
-            setError("Passwords do not match");
+            validationErrors.passwordConfirm = "Passwords do not match";
+        }
+
+        setError(validationErrors);
+
+        if (hasValidationErrors(validationErrors)) {
             return;
         }
+
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, registerEmail, registerPassword);
             const user = userCredential.user;
             // Update user profile with the name
             await updateProfile(user, { displayName: registerName });
-            navigate('/');
+            setAppMode("user");
+            navigate('/app/todos');
             
             // console.log(user);
         } catch(error){
-            setError(error.message);
+            setError({ form: getFirebaseAuthErrorMessage(error.code) });
             // console.log(error.message);
         }
     };
@@ -52,6 +68,7 @@ export default function Signup(){
                                 }} 
                                 placeholder="Your Name" 
                             />
+                            {error.name && <p className='text-xs text-red-400'>{error.name}</p>}
                         </div>
                         <div className='pt-4 flex flex-col'>
                             <label htmlFor='email'>Email</label>
@@ -90,8 +107,9 @@ export default function Signup(){
                                 }}
                                 placeholder='Confirm your password' 
                             />
-                            {error && <p className='text-xs text-red-400'>{error}</p>}
+                            {error.passwordConfirm && <p className='text-xs text-red-400'>{error.passwordConfirm}</p>}
                         </div>
+                        {error.form && <p className='mb-4 text-sm text-red-400'>{error.form}</p>}
                         <button
                             className='button w-full mt-4 -bg--primary -text--on-primary rounded'
                             onClick={register}

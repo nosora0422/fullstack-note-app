@@ -12,7 +12,7 @@ export default function SignupValidation(values){
     if(values.email === ''){
         error.email = "Please enter your email"
     }else if(!email_pattern.test(values.email)){
-        error.email = "Email or password did not match"
+        error.email = "Please enter a valid email address"
     }else{
         error.email = ""
     }
@@ -20,7 +20,7 @@ export default function SignupValidation(values){
     if(values.password === ''){
         error.password = "Please enter your password"
     }else if(!password_pattern.test(values.password)){
-        error.password = "Email or password did not match"
+        error.password = "Password must be at least 8 characters and include uppercase, lowercase, and a number"
     } else {
         error.password = ""
     }

@@ -3,21 +3,49 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase.config';
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
+import { setAppMode } from '../utils/storage';
+import LoginValidation from '../LoginValidation';
+import { getFirebaseAuthErrorMessage, hasValidationErrors } from '../utils/authErrors';
 
 export default function Login(){
     const [loginEmail, setLoginEmail] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
-    const [error, setError] = useState("");
+    const [error, setError] = useState({});
     const navigate = useNavigate();
+    const googleProvider = new GoogleAuthProvider();
     
     const login = async () => {
+        const validationErrors = LoginValidation({
+            email: loginEmail,
+            password: loginPassword,
+        });
+
+        setError(validationErrors);
+
+        if (hasValidationErrors(validationErrors)) {
+            return;
+        }
+
         try {
             const user = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-            navigate('/app');        
+            setAppMode("user");
+            navigate('/app/todos');        
             console.log(user);
         } catch(error){
-            setError(error.message);
+            setError({ form: getFirebaseAuthErrorMessage(error.code) });
+            console.log(error.message);
+        }
+    };
+
+    const loginWithGoogle = async () => {
+        try {
+            const user = await signInWithPopup(auth, googleProvider);
+            setAppMode("user");
+            navigate('/app/todos');
+            console.log(user);
+        } catch(error){
+            setError({ form: getFirebaseAuthErrorMessage(error.code) });
             console.log(error.message);
         }
     };
@@ -38,7 +66,7 @@ export default function Login(){
                                     onChange={(event)=>{setLoginEmail(event.target.value)}} 
                                     placeholder='youremail@example.com' 
                                 />
-                                {error&& <p className='text-xs text-red-400'>{error}</p> }
+                                {error.email && <p className='text-xs text-red-400'>{error.email}</p>}
                             </div>
                             <div className='pt-4 flex flex-col h-20'>
                                 <label htmlFor='password'>Password</label>
@@ -49,13 +77,20 @@ export default function Login(){
                                     onChange={(event)=>{setLoginPassword(event.target.value)}} 
                                     placeholder='Your password'
                                 />
-                                {error && <p className='text-xs text-red-400'>{error}</p> }
+                                {error.password && <p className='text-xs text-red-400'>{error.password}</p>}
                             </div>
+                            {error.form && <p className='mt-4 text-sm text-red-400'>{error.form}</p>}
                             <button 
                                 className='button w-full mt-8 -bg--primary -text--on-primary rounded'
                                 onClick={login}
                             >
                                 Log in
+                            </button>
+                            <button
+                                className='button w-full mt-4 -bg--primary-container -text--on-primary-container rounded'
+                                onClick={loginWithGoogle}
+                            >
+                                Continue with Google
                             </button>
                         </div>
                     </div>
@@ -66,7 +101,13 @@ export default function Login(){
                         >
                             Sign up
                         </Link>
-                        <Link to="/app" className=" -text--main-font-color  underline mt-4">Enter as a guest</Link>
+                        <Link
+                            to="/guest/todos"
+                            className=" -text--main-font-color  underline mt-4"
+                            onClick={() => setAppMode("guest")}
+                        >
+                            Enter as a guest
+                        </Link>
                     </div>
                 </div>
             </div>

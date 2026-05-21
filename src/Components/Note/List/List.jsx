@@ -1,27 +1,35 @@
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import NoteItems from "../Items/Items";
+import { getLegacyStorageKey, migrateLegacyData, readStorageItems, useScopedStorageKey } from "../../../utils/storage";
 
 export default function List({ searchTerm }){
     const [textVal, setTextVal] = useState('');
     const [items, setItems] = useState([]);
     const [titleVal, setTitleVal] = useState('');
     const [categoryVal, setCategoryVal] = useState('Personal');
+    const { key: storageKey, isReady } = useScopedStorageKey("notes");
+    const [loadedStorageKey, setLoadedStorageKey] = useState(null);
 
     //get data from localstorage
     useEffect(()=>{
-        const storedData = localStorage.getItem('note_data');
-        // console.log(storedData);
-
-        if(storedData !== null){
-            setItems(JSON.parse(storedData));
+        if (!isReady || !storageKey) {
+            return;
         }
-    },[]);
+
+        migrateLegacyData(getLegacyStorageKey("notes"), storageKey);
+        setItems(readStorageItems(storageKey));
+        setLoadedStorageKey(storageKey);
+    },[isReady, storageKey]);
 
     //save data to localstorage whenver items updated
     useEffect(() => {
-        localStorage.setItem('note_data', JSON.stringify(items));
-    }, [items]);
+        if (!isReady || !storageKey || loadedStorageKey !== storageKey) {
+            return;
+        }
+
+        localStorage.setItem(storageKey, JSON.stringify(items));
+    }, [items, isReady, storageKey, loadedStorageKey]);
 
 
     const addItem = () => {

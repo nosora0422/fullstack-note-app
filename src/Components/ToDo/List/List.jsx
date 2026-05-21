@@ -4,27 +4,35 @@ import TodoItems from "../Items/Items";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSquare as regularSquare } from '@fortawesome/free-regular-svg-icons';
 import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { getLegacyStorageKey, migrateLegacyData, readStorageItems, useScopedStorageKey } from "../../../utils/storage";
 
 export default function List({ searchTerm }){
     const [taskValues, setTaskValues] = useState(['']);
     const [items, setItems] = useState([]);
     const [titleVal, setTitleVal] = useState('');
     const [categoryVal, setCategoryVal] = useState('personal');
+    const { key: storageKey, isReady } = useScopedStorageKey("todos");
+    const [loadedStorageKey, setLoadedStorageKey] = useState(null);
 
     //get data from localstorage
     useEffect(()=>{
-        const storedData = localStorage.getItem('todolist_data');
-        // console.log(storedData);
-
-        if(storedData !== null){
-            setItems(JSON.parse(storedData));
+        if (!isReady || !storageKey) {
+            return;
         }
-    },[]);
+
+        migrateLegacyData(getLegacyStorageKey("todos"), storageKey);
+        setItems(readStorageItems(storageKey));
+        setLoadedStorageKey(storageKey);
+    },[isReady, storageKey]);
 
     //save data to localstorage whenever items updated
     useEffect(() => {
-        localStorage.setItem('todolist_data', JSON.stringify(items));
-    }, [items]);
+        if (!isReady || !storageKey || loadedStorageKey !== storageKey) {
+            return;
+        }
+
+        localStorage.setItem(storageKey, JSON.stringify(items));
+    }, [items, isReady, storageKey, loadedStorageKey]);
 
     //update taskValues obtained from input
     const handleTaskChange = (index, value) => {
