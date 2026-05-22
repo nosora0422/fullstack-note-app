@@ -74,9 +74,9 @@ export default function ImageList({ searchTerm }) {
                   setCategoryVal(event.target.value);
                 }}
               >
-                <option value="personal">Personal</option>
-                <option value="school">School</option>
-                <option value="work">Work</option>
+                <option value="Personal">Personal</option>
+                <option value="School">School</option>
+                <option value="Work">Work</option>
               </select>
               <div className="flex items-center bg-white rounded-sm">
                 <input
@@ -129,17 +129,11 @@ export default function ImageList({ searchTerm }) {
             </div>
             <div className="flex justify-end gap-3 mt-8">
               <button
-                className="button -bg--primary -text--on-primary"
+                className="button button-primary w-min"
                 type="submit"
                 onClick={() => addItem()}
               >
                 Create
-              </button>
-              <button 
-                className="button -bg--primary-container -text--on-primary-container" 
-                type="submit"
-              >
-                Cancel
               </button>
             </div>
           </div>

@@ -14,6 +14,7 @@ export default function Login(){
     const [error, setError] = useState({});
     const navigate = useNavigate();
     const googleProvider = new GoogleAuthProvider();
+    const googleLogo = '/assets/Google_G_Logo.png';
     
     const login = async () => {
         const validationErrors = LoginValidation({
@@ -87,10 +88,11 @@ export default function Login(){
                                 Log in
                             </button>
                             <button
-                                className='button w-full mt-4 -bg--primary-container -text--on-primary-container rounded'
+                                className='button w-full mt-4 -bg--primary-container -text--on-primary-container rounded flex items-center justify-center gap-3'
                                 onClick={loginWithGoogle}
                             >
-                                Continue with Google
+                                <img src={googleLogo} alt="Google" className="w-5 h-5"/>
+                                Sign in with Google
                             </button>
                         </div>
                     </div>

@@ -87,10 +87,10 @@ export default function Header(){
                     </ul>
                     
             </nav>
-            <nav className="fixed top-0 left-0 w-2/12 min-w-[164px] hidden md:block h-screen py-10 px-4 bg-white drop-shadow-xl">
+            <nav className="fixed top-0 left-0 w-2/12 min-w-[164px] hidden md:flex md:flex-col h-screen py-10 px-4 bg-white drop-shadow-xl">
                 <h2 className="text-xl">Hi, {user ? user.displayName || "Guest" : "Guest"}!</h2>
                 <h1 className="text-3xl mb-10">Note App</h1>
-                <ul className="flex flex-col justify-between h-40">
+                <ul className="flex flex-col flex-grow h-40">
                     <li>
                         <Link to={todosPath} className={(cRoute.pathname === '/app' || cRoute.pathname.endsWith('/todos')) ? 'nav-item-curr' : 'nav-item'}><FontAwesomeIcon icon={faListCheck} className="mr-2"/>To Do List
                         </Link>
@@ -111,7 +111,7 @@ export default function Header(){
                         </Link>
                     </li>
                 </ul>
-                <button className="button absolute bottom-9 -text--main-font-color -bg--surface-container-highest" onClick={logout}><FontAwesomeIcon icon={faPowerOff} className="mr-2" />Logout</button>
+                <button className="button button-tertiary w-full" onClick={logout}><FontAwesomeIcon icon={faPowerOff} className="mr-2" />Logout</button>
             </nav>
         </header>
         </>

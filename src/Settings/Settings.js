@@ -75,18 +75,17 @@ export default function Settings() {
 
   return (
     <div className="container">
-      <div className="w-full mt-8 lg:mt-11">
+      <div className="w-full mx-auto mt-8 lg:mt-11">
         <h1 className="text-3xl my-4">Settings</h1>
-        <div className="w-full p-4 rounded-md -bg--surface-container">
+        <div className="w-full rounded-md">
           <div className="mb-8">
-            <h2 className="text-xl mb-2">Account</h2>
             <p>{isGuest ? "Guest mode" : user.email}</p>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="w-full md:w-1/2 lg:w-1/3 flex flex-col gap-3">
             {DATA_TYPES.map(({ label, type }) => (
               <button
-                className="button w-full -bg--primary-container -text--on-primary-container"
+                className="button button-secondary w-full"
                 key={type}
                 onClick={() => clearDataType(type)}
               >
@@ -94,13 +93,13 @@ export default function Settings() {
               </button>
             ))}
             <button
-              className="button w-full -bg--primary -text--on-primary"
+              className="button button-primary w-full"
               onClick={clearAllCurrentData}
             >
               Clear All Saved Data
             </button>
             <button
-              className="button w-full -bg--surface-container-highest -text--main-font-color"
+              className="button button-tertiary w-full"
               onClick={logout}
             >
               Logout

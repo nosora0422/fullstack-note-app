@@ -6,11 +6,11 @@ import { faSquareCheck as checked }from '@fortawesome/free-solid-svg-icons';
 import { faSquare as unchecked} from '@fortawesome/free-regular-svg-icons';
 
 export default function ToDoItems({ entries, delRef }){
-    const [currFilter, setCurrFilter] = useState('all');
-    const filterList = ['all', 'school', 'work', 'personal'];
+    const [currFilter, setCurrFilter] = useState('All');
+    const filterList = ['All', 'School', 'Work', 'Personal'];
 
     const [currSort, setCurrSort] = useState('Date');
-    const sortList = ['date', 'text'];
+    const sortList = ['Date', 'Text'];
 
     const fEntries = sortAndFilterList(entries, currFilter, currSort);
 
@@ -95,10 +95,10 @@ function sortAndFilterList(entries, currFilter, currSort) {
     // console.log('Current Sort:', currSort);
     return entries
         .filter((cItem) => {
-            return cItem.category === currFilter || currFilter === 'all';
+            return cItem.category === currFilter || currFilter === 'All';
         })
         .sort((a, b) => {
-            if (currSort === "text") {
+            if (currSort === "Text") {
                 if (a.title > b.title)
                     return 1;
                 else if (a.title === b.title)

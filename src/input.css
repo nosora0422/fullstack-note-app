@@ -40,4 +40,15 @@
         @apply py-2 px-6 border-0 rounded-full text-center;
     }
 
+    .button-primary {
+        @apply -bg--primary -text--on-primary hover:brightness-90;
+    }
+
+    .button-secondary {
+        @apply -bg--primary-container -text--on-primary-container hover:brightness-90;
+    }
+    .button-tertiary {
+        @apply -bg--surface-container-highest -text--main-font-color hover:brightness-90;
+    }
+
 }
