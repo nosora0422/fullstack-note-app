@@ -11,6 +11,8 @@ export default function ImageList({ searchTerm }) {
   const [categoryVal, setCategoryVal] = useState('Personal');
   const { key: storageKey, isReady } = useScopedStorageKey("images");
   const [loadedStorageKey, setLoadedStorageKey] = useState(null);
+  const isCreateDisabled =
+    titleVal.trim() === '' && textVal.trim() === '' && imagePath.trim() === '';
 
   //get data from localstorage
   useEffect(() => {
@@ -68,7 +70,8 @@ export default function ImageList({ searchTerm }) {
           <div className="h-min p-4 rounded-md -bg--surface-container">
             <div className="flex flex-col gap-2">
               <select
-                className="w-full py-2 px-4 border-none rounded-sm focus: outline-0"
+                name="category"
+                className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none"
                 value={categoryVal}
                 onChange={(event) => {
                   setCategoryVal(event.target.value);
@@ -80,7 +83,7 @@ export default function ImageList({ searchTerm }) {
               </select>
               <div className="flex items-center bg-white rounded-sm">
                 <input
-                  className="w-full mx-2 py-2 px-2 border-none focus: outline-0"
+                  className="w-full mx-2 py-2 px-2 border-none focus:ring-0 focus:outline-none focus-visible:outline-none"
                   value={titleVal}
                   onChange={(event) => {
                     setTitleVal(event.target.value);
@@ -90,13 +93,8 @@ export default function ImageList({ searchTerm }) {
               </div>
               <div className="flex flex-col justify-center min-h-24 items-center bg-white rounded-sm">
                 {!!imagePath && <img src={imagePath} className=" w-3/5 object-center object-cover" alt={titleVal} />}
-                <input 
-                  name="input-box" 
-                  value={imagePath} 
-                  hidden
-                />
                 <input
-                  className="w-full mx-auto px-4"
+                  className="mx-auto px-4"
                   type="file"
                   accept="image/png, image/jpg, image/webp, image/jpeg, image/gif, image/svg"
                   onChange={(event) => {
@@ -118,7 +116,7 @@ export default function ImageList({ searchTerm }) {
               </div>
               <div className="flex items-center bg-white rounded-sm">
                 <input
-                  className="w-full mx-2 py-2 px-2 border-none focus: outline-0"
+                  className="w-full mx-2 py-2 px-2 border-none focus:ring-0 focus:outline-none focus-visible:outline-none"
                   value={textVal}
                   onChange={(event) => {
                     setTextVal(event.target.value);
@@ -129,8 +127,9 @@ export default function ImageList({ searchTerm }) {
             </div>
             <div className="flex justify-end gap-3 mt-8">
               <button
-                className="button button-primary w-min"
+                className={`button button-primary w-min ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 type="submit"
+                disabled={isCreateDisabled}
                 onClick={() => addItem()}
               >
                 Create

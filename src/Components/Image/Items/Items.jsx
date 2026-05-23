@@ -2,6 +2,7 @@ import { useState } from "react";
 import ButtonGroup from "../../ButtonGroup/ButtonGroup";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
 
 export default function ImageItems({ entries, delRef }){
     const [currFilter, setCurrFilter] = useState('All');
@@ -9,8 +10,18 @@ export default function ImageItems({ entries, delRef }){
 
     const [currSort, setCurrSort] = useState('Date');
     const sortList = ['Date', 'Text'];
+    const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
     const fEntries = sortAndFilterList(entries, currFilter, currSort);
+
+    const handleConfirmDelete = () => {
+        if (!pendingDeleteId) {
+            return;
+        }
+
+        delRef(pendingDeleteId);
+        setPendingDeleteId(null);
+    };
 
     return(
         <div>
@@ -31,32 +42,42 @@ export default function ImageItems({ entries, delRef }){
                 </div>
             </div>
             <ul className="my-grid">
-                {fEntries.length > 0 ? fEntries.map((item) => (<DrawImage key={item.id} item={item} delRef={delRef} />)) : <li className="col-span-12 w-full py-4 px-6 rounded-md -bg--surface-bright">No items to display</li>}
+                {fEntries.length > 0 ? fEntries.map((item) => (<DrawImage key={item.id} item={item} onRequestDelete={setPendingDeleteId} />)) : <li className="col-span-12 w-full py-4 px-6 rounded-md -bg--surface-bright">No items to display</li>}
             </ul>
+            <ConfirmationModal
+                isOpen={Boolean(pendingDeleteId)}
+                message="Delete this image entry?"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setPendingDeleteId(null)}
+            />
         </div>
 
     );
 }
 
-function DrawImage({ item, delRef }){
+function DrawImage({ item, onRequestDelete }){
     return(
-        <li className="col-span-12 lg:col-span-6 flex flex-col gap-3 w-full py-4 px-6 rounded-md -bg--surface-bright" key={item.id}>
-            <div className="text-xs">
-                {retDateString(item.date)}
+        <li className="col-span-12 lg:col-span-6 flex flex-col gap-4 w-full py-4 px-4 rounded-md -bg--surface-bright" key={item.id}>
+            <div>
+                <div className="flex justify-between items-center">
+                    <p className="text-xs">
+                        {retDateString(item.date)}
+                    </p>
+                    <button
+                        type="button"
+                        className="p-1 border-0 bg-transparent cursor-pointer"
+                        onClick={() => onRequestDelete(item.id)}
+                    >
+                        <FontAwesomeIcon icon={faTrashCan} />
+                    </button>
+                </div>
+                <p className="inline-block py-1 px-4 text-xs rounded-full -text--on-primary-container -bg--primary-container">{item.category}</p>
             </div>
-            <div className="flex justify-between items-center">
-                <p className="inlint-block py-2 px-4 text-xs rounded-full -text--on-primary-container -bg--primary-container">{item.category}</p>
-                <button
-                    type="button"
-                    className="p-2 border-0 bg-transparent cursor-pointer"
-                    onClick={() => delRef(item.id)}
-                >
-                <FontAwesomeIcon icon={faTrashCan} />
-                </button>
+            <div>
+                <h2 className="font-medium text-lg">{item.title}</h2>
+                <img className="w-3/5 mx-auto" src={item.path} alt={item.title} />
+                <p className="font-normal">{item.note}</p>
             </div>
-            <h2 className="font-medium text-lg">{item.title}</h2>
-            <img className="w-3/5 mx-auto " src={item.path} alt={item.title} />
-            <p className="font-light">{item.note}</p>
         </li>
     )
 }

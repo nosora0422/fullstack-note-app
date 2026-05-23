@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSquare as regularSquare } from '@fortawesome/free-regular-svg-icons';
 import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getLegacyStorageKey, migrateLegacyData, readStorageItems, useScopedStorageKey } from "../../../utils/storage";
+import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
 
 export default function List({ searchTerm }){
     const [taskValues, setTaskValues] = useState(['']);
@@ -13,6 +14,8 @@ export default function List({ searchTerm }){
     const [categoryVal, setCategoryVal] = useState('personal');
     const { key: storageKey, isReady } = useScopedStorageKey("todos");
     const [loadedStorageKey, setLoadedStorageKey] = useState(null);
+    const [pendingTaskDeleteIndex, setPendingTaskDeleteIndex] = useState(null);
+    const isCreateDisabled = titleVal.trim() === '' && taskValues.every((task) => task.trim() === '');
 
     //get data from localstorage
     useEffect(()=>{
@@ -50,6 +53,15 @@ export default function List({ searchTerm }){
     const removeTaskInput = (index) => {
         const updatedTasks = taskValues.filter((_, i) => i !== index);
         setTaskValues(updatedTasks);
+    };
+
+    const confirmRemoveTaskInput = () => {
+        if (pendingTaskDeleteIndex === null) {
+            return;
+        }
+
+        removeTaskInput(pendingTaskDeleteIndex);
+        setPendingTaskDeleteIndex(null);
     };
 
     const addItem = () => {
@@ -92,7 +104,8 @@ export default function List({ searchTerm }){
                     <div className="h-min p-4 rounded-md -bg--surface-container">
                         <div className="flex flex-col gap-2">
                             <select
-                                className="w-full py-2 px-4 border-none rounded-sm focus: outline-0"
+                                name="category"
+                                className="w-full py-2 px-4 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                                 value={categoryVal}
                                 onChange={event => {
                                     setCategoryVal(event.target.value)
@@ -104,9 +117,9 @@ export default function List({ searchTerm }){
                             </select>
                             <div className="flex items-center bg-white rounded-sm">
                                 <input
-                                    className="w-full mx-2 py-2 px-2 border-none focus: outline-0"
+                                    className="w-full mx-2 py-2 px-2 border-0 focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                                     value={titleVal}
-                                    onChange={(event) => {
+                                    onChange={(event) => {  
                                         setTitleVal(event.target.value);
                                     }}
                                     placeholder="Enter Title">
@@ -116,7 +129,7 @@ export default function List({ searchTerm }){
                                 <div className="flex items-center bg-white rounded-sm" key={index}>
                                     <FontAwesomeIcon icon={regularSquare} className="ml-4 -text--secondary"/>
                                     <input
-                                        className="w-full mx-2 py-2 px-2 border-none focus: outline-0"
+                                        className="w-full mx-2 py-2 px-2 border-0 focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                                         value={task}
                                         onChange={(event) => handleTaskChange(index, event.target.value)}
                                         placeholder="Enter Task"
@@ -124,7 +137,7 @@ export default function List({ searchTerm }){
                                     {index > 0 && (
                                         <button 
                                             className="p-2 border-0 bg-transparent cursor-pointer" 
-                                            onClick={() => removeTaskInput(index)}
+                                            onClick={() => setPendingTaskDeleteIndex(index)}
                                         ><FontAwesomeIcon icon={faTrashCan} />
                                         </button>
                                     )}
@@ -132,16 +145,24 @@ export default function List({ searchTerm }){
                             ))}
                             <button 
                                 type="submit"
-                                className="button rounded-sm mt-2 -bg--surface-container-highest -text--on-primary-container"
+                                className="button button-tertiary rounded-sm mt-2 "
                                 onClick={addTaskInput}
                             >
-                            <FontAwesomeIcon icon={faPlus} /> Add Task
+                                <FontAwesomeIcon icon={faPlus} /> Add Task
                             </button>
                         </div>
+                        <ConfirmationModal
+                            isOpen={pendingTaskDeleteIndex !== null}
+                            title="Remove Task"
+                            message="Do you want to remove this task row?"
+                            onConfirm={confirmRemoveTaskInput}
+                            onCancel={() => setPendingTaskDeleteIndex(null)}
+                        />
                         <div className="flex justify-end gap-2 mt-8">
                             <button
-                                className="button button-primary w-min"
+                                className={`button button-primary w-min ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 type="submit"
+                                disabled={isCreateDisabled}
                                 onClick={() => addItem()}
                             >
                                 Create

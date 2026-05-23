@@ -37,18 +37,18 @@
         @apply py-3 px-3 mb-1 rounded-lg font-medium -text--on-primary -bg--primary;
     }
     .button{
-        @apply py-2 px-6 border-0 rounded-full text-center;
+        @apply py-2 px-6 border-0 rounded-full text-center font-medium;
     }
 
     .button-primary {
-        @apply -bg--primary -text--on-primary hover:brightness-90;
+        @apply -bg--primary -text--on-primary hover:-bg--primary-hover;
     }
 
     .button-secondary {
-        @apply -bg--primary-container -text--on-primary-container hover:brightness-90;
+        @apply -bg--primary-container -text--on-primary-container hover:-bg--primary-container-hover;
     }
     .button-tertiary {
-        @apply -bg--surface-container-highest -text--main-font-color hover:brightness-90;
+        @apply -bg--surface-container-highest -text--main-font-color hover:-bg--surface-container-highest-hover;
     }
 
 }

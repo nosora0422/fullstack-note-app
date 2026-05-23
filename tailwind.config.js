@@ -7,10 +7,12 @@ module.exports = {
       colors: {
        '--surface-container-low': '#F2F5EA',
         '--primary': '#436833',
+        '--primary-hover': '#2D462B',
         '--main-font-color': '#212121',
         '--on-primary': '#ffffff',
         '--surface-container': '#ECEFE5;',
         '--primary-container': '#C4EFAC',
+        '--primary-container-hover': '#A6E781',
         '--secondary-container':' #C0D0B4',
         '--on-primary-container': '#052100',
         '--secondary': '#55624C',
@@ -20,6 +22,7 @@ module.exports = {
         '--tertiary-container': '#BBEBEC',
         '--surface-bright':'#F8FAF0',
         '--surface-container-highest': '#E1E4DA',
+        '--surface-container-highest-hover': '#C9CEBD',
         '--surface': '#F8FAF0',
         '--search-bar': '#F2F2F2'
       },

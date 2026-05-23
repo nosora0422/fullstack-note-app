@@ -3,7 +3,7 @@ export default function ButtonGroup({validList, currentState, callBackState}){
         return(
             <button
                 key={item}
-                className={(currentState === item) ? 'px-4 py-1 mr-2 border border-solid -border--tertiary rounded-full -bg--tertiary -text--on-primary' : 'px-4 py-1 mr-2 border border-solid rounded-full -bg--white -text--outline'}
+                className={`px-3 md:px-4 md:py-1 mr-2 border border-solid rounded-full md:text-md ${currentState === item ? '-border--tertiary font-medium -bg--tertiary -text--on-primary' : ' -bg--white -text--outline'}`}
                 onClick={ ()=>{ callBackState(item) }}
             >{item}</button>
         );

@@ -7,10 +7,13 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 
 import { setAppMode } from '../utils/storage';
 import LoginValidation from '../LoginValidation';
 import { getFirebaseAuthErrorMessage, hasValidationErrors } from '../utils/authErrors';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 export default function Login(){
     const [loginEmail, setLoginEmail] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState({});
     const navigate = useNavigate();
     const googleProvider = new GoogleAuthProvider();
@@ -71,13 +74,23 @@ export default function Login(){
                             </div>
                             <div className='pt-4 flex flex-col h-20'>
                                 <label htmlFor='password'>Password</label>
-                                <input 
-                                    className="border border-solid -border--outline rounded py-2 px-3" 
-                                    name='password'
-                                    type='password'
-                                    onChange={(event)=>{setLoginPassword(event.target.value)}} 
-                                    placeholder='Your password'
-                                />
+                                <div className="flex items-center border border-solid -border--outline rounded">
+                                    <input 
+                                        className="w-full border-0 rounded py-2 px-3 focus:ring-0 focus:outline-none focus-visible:outline-none" 
+                                        name='password'
+                                        type={showPassword ? 'text' : 'password'}
+                                        onChange={(event)=>{setLoginPassword(event.target.value)}} 
+                                        placeholder='Your password'
+                                    />
+                                    <button
+                                        type='button'
+                                        className='px-3 py-2 text-sm -text--outline border-0 bg-transparent cursor-pointer'
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                    >
+                                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} size="lg"/>
+                                    </button>
+                                </div>
                                 {error.password && <p className='text-xs text-red-400'>{error.password}</p>}
                             </div>
                             {error.form && <p className='mt-4 text-sm text-red-400'>{error.form}</p>}

@@ -48,7 +48,7 @@ export default function Header(){
         <>
         <header>
             <nav className="w-full flex flex-col justify-between py-4 px-6 bg-white drop-shadow-sm md:hidden">
-                <div className="w-full flex justify-between cursor-pointer" onClick={handleMNav}>
+                <div className="w-full flex justify-between items-center cursor-pointer" onClick={handleMNav}>
                     <FontAwesomeIcon icon={isNavOpen ? faXmark : faBars} />
                     <h1>Note App</h1>
                 </div>
@@ -88,7 +88,7 @@ export default function Header(){
                     
             </nav>
             <nav className="fixed top-0 left-0 w-2/12 min-w-[164px] hidden md:flex md:flex-col h-screen py-10 px-4 bg-white drop-shadow-xl">
-                <h2 className="text-xl">Hi, {user ? user.displayName || "Guest" : "Guest"}!</h2>
+                <h2 className="text-xl">👋Hi, {user ? user.displayName || "Guest" : "Guest"}!</h2>
                 <h1 className="text-3xl mb-10">Note App</h1>
                 <ul className="flex flex-col flex-grow h-40">
                     <li>

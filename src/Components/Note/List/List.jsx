@@ -10,6 +10,7 @@ export default function List({ searchTerm }){
     const [categoryVal, setCategoryVal] = useState('Personal');
     const { key: storageKey, isReady } = useScopedStorageKey("notes");
     const [loadedStorageKey, setLoadedStorageKey] = useState(null);
+    const isCreateDisabled = titleVal.trim() === '' && textVal.trim() === '';
 
     //get data from localstorage
     useEffect(()=>{
@@ -66,7 +67,8 @@ export default function List({ searchTerm }){
                     <div className="th-min p-4 rounded-md -bg--surface-container">
                         <div className="flex flex-col gap-2">
                             <select
-                                className="w-full py-2 px-4 border-none rounded-sm focus: outline-0"
+                                name="category"
+                                className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none"
                                 value={categoryVal}
                                 onChange={event => {
                                     setCategoryVal(event.target.value)
@@ -78,7 +80,7 @@ export default function List({ searchTerm }){
                             </select>
                             <div className="flex items-center bg-white rounded-sm">
                                 <input
-                                    className="w-full py-2 px-4 border-none rounded-sm focus: outline-0"
+                                    className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none"
                                     value={titleVal}
                                     onChange={(event) => {
                                         setTitleVal(event.target.value);
@@ -88,7 +90,7 @@ export default function List({ searchTerm }){
                             </div>
                             <div className="iflex items-center bg-white rounded-sm">
                                 <textarea
-                                    className="w-full py-2 px-4 border-none rounded-sm focus: outline-0 font-Roboto h-52"
+                                    className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none font-Roboto h-52"
                                     value={textVal}
                                     onChange={(event) => {setTextVal(event.target.value);
                                     }}
@@ -98,8 +100,9 @@ export default function List({ searchTerm }){
                         </div>
                         <div className="flex justify-end gap-3 mt-8">
                             <button
-                                className="button button-primary w-min"
+                                className={`button button-primary w-min ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 type="submit"
+                                disabled={isCreateDisabled}
                                 onClick={() => addItem()}
                             >
                                 Create
