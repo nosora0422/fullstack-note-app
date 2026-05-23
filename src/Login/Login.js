@@ -9,6 +9,7 @@ import LoginValidation from '../LoginValidation';
 import { getFirebaseAuthErrorMessage, hasValidationErrors } from '../utils/authErrors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import googleLogo from '../assets/Google_G_Logo.png';
 
 export default function Login(){
     const [loginEmail, setLoginEmail] = useState("");
@@ -17,7 +18,6 @@ export default function Login(){
     const [error, setError] = useState({});
     const navigate = useNavigate();
     const googleProvider = new GoogleAuthProvider();
-    const googleLogo = '/assets/Google_G_Logo.png';
     
     const login = async () => {
         const validationErrors = LoginValidation({
