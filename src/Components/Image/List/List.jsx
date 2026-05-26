@@ -55,11 +55,15 @@ export default function ImageList({ searchTerm }) {
   };
 
   const deleteItem = (key) => {
-    let filteredItems = items.filter((item) => {
+    setItems((currentItems) => currentItems.filter((item) => {
       return item.id !== key;
-    });
+    }));
+  };
 
-    setItems(filteredItems);
+  const updateItem = (updatedItem) => {
+    setItems((currentItems) => currentItems.map((item) => {
+      return item.id === updatedItem.id ? updatedItem : item;
+    }));
   };
 
   return (
@@ -124,16 +128,14 @@ export default function ImageList({ searchTerm }) {
                   placeholder="Enter Note"
                 />
               </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-8">
-              <button
-                className={`button button-primary w-min ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                type="submit"
-                disabled={isCreateDisabled}
-                onClick={() => addItem()}
-              >
-                Create
-              </button>
+                <button
+                  className={`button button-primary ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  type="submit"
+                  disabled={isCreateDisabled}
+                  onClick={() => addItem()}
+                >
+                  Create
+                </button>
             </div>
           </div>
         </div>
@@ -149,6 +151,7 @@ export default function ImageList({ searchTerm }) {
               );
             })}
             delRef={deleteItem}
+            updateRef={updateItem}
           />
         </div>
       </div>

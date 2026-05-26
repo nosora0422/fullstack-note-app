@@ -49,7 +49,7 @@ export default function List({ searchTerm }){
         setTaskValues([...taskValues, '']);
     };
 
-    //Remove input box and entered data from task array 
+    //Remove input box and entered data from task array
     const removeTaskInput = (index) => {
         const updatedTasks = taskValues.filter((_, i) => i !== index);
         setTaskValues(updatedTasks);
@@ -89,11 +89,16 @@ export default function List({ searchTerm }){
     }
 
     const deleteItem = (key) =>{
-        let filteredItems = items.filter((item)=>{return (item.id !== key);
-        });
-
-        setItems(filteredItems);
+        setItems((currentItems) => currentItems.filter((item) => {
+            return item.id !== key;
+        }));
     }
+
+    const updateItem = (updatedItem) => {
+        setItems((currentItems) => currentItems.map((item) => {
+            return item.id === updatedItem.id ? updatedItem : item;
+        }));
+    };
 
 
     return(
@@ -119,7 +124,7 @@ export default function List({ searchTerm }){
                                 <input
                                     className="w-full mx-2 py-2 px-2 border-0 focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                                     value={titleVal}
-                                    onChange={(event) => {  
+                                    onChange={(event) => {
                                         setTitleVal(event.target.value);
                                     }}
                                     placeholder="Enter Title">
@@ -135,21 +140,31 @@ export default function List({ searchTerm }){
                                         placeholder="Enter Task"
                                     />
                                     {index > 0 && (
-                                        <button 
-                                            className="p-2 border-0 bg-transparent cursor-pointer" 
+                                        <button
+                                            className="p-2 border-0 bg-transparent cursor-pointer"
                                             onClick={() => setPendingTaskDeleteIndex(index)}
                                         ><FontAwesomeIcon icon={faTrashCan} />
                                         </button>
                                     )}
                                 </div>
                             ))}
-                            <button 
-                                type="submit"
-                                className="button button-tertiary rounded-sm mt-2 "
-                                onClick={addTaskInput}
-                            >
-                                <FontAwesomeIcon icon={faPlus} /> Add Task
-                            </button>
+                            <div className="w-full flex flex-col gap-2">
+                                <button
+                                    type="submit"
+                                    className="button button-tertiary rounded-sm mt-2 "
+                                    onClick={addTaskInput}
+                                >
+                                    <FontAwesomeIcon icon={faPlus} /> Add Task
+                                </button>
+                                <button
+                                    className={`button button-primary ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    type="submit"
+                                    disabled={isCreateDisabled}
+                                    onClick={() => addItem()}
+                                >
+                                    Create
+                                </button>
+                            </div>
                         </div>
                         <ConfirmationModal
                             isOpen={pendingTaskDeleteIndex !== null}
@@ -158,16 +173,6 @@ export default function List({ searchTerm }){
                             onConfirm={confirmRemoveTaskInput}
                             onCancel={() => setPendingTaskDeleteIndex(null)}
                         />
-                        <div className="flex justify-end gap-2 mt-8">
-                            <button
-                                className={`button button-primary w-min ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                type="submit"
-                                disabled={isCreateDisabled}
-                                onClick={() => addItem()}
-                            >
-                                Create
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <div className="col-span-12 lg:col-span-8">
@@ -181,6 +186,7 @@ export default function List({ searchTerm }){
                             );
                         })}
                         delRef={deleteItem}
+                        updateRef={updateItem}
                     />
                 </div>
             </div>

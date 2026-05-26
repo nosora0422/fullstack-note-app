@@ -52,11 +52,16 @@ export default function List({ searchTerm }){
     }
 
     const deleteItem = (key) =>{
-        let filteredItems = items.filter((item)=>{return (item.id !== key);
-        });
-
-        setItems(filteredItems);
+        setItems((currentItems) => currentItems.filter((item) => {
+            return item.id !== key;
+        }));
     }
+
+    const updateItem = (updatedItem) => {
+        setItems((currentItems) => currentItems.map((item) => {
+            return item.id === updatedItem.id ? updatedItem : item;
+        }));
+    };
 
 
     return(
@@ -97,10 +102,8 @@ export default function List({ searchTerm }){
                                     placeholder="Enter Note"
                                 />
                             </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-8">
                             <button
-                                className={`button button-primary w-min ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`button button-primary ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 type="submit"
                                 disabled={isCreateDisabled}
                                 onClick={() => addItem()}
@@ -108,6 +111,7 @@ export default function List({ searchTerm }){
                                 Create
                             </button>
                         </div>
+
                     </div>
                 </div>
                 <div className="col-span-12 lg:col-span-8">
@@ -121,6 +125,7 @@ export default function List({ searchTerm }){
                             );
                         })}
                         delRef={deleteItem}
+                        updateRef={updateItem}
                     />
                 </div>
             </div>

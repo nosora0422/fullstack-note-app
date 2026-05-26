@@ -1,10 +1,11 @@
 import { useState } from "react";
 import ButtonGroup from "../../ButtonGroup/ButtonGroup";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
+import Pill from "../../Pill/Pill";
 
-export default function ImageItems({ entries, delRef }){
+export default function ImageItems({ entries, delRef, updateRef }){
     const [currFilter, setCurrFilter] = useState('All');
     const filterList = ['All', 'School', 'Work', 'Personal'];
 
@@ -27,22 +28,22 @@ export default function ImageItems({ entries, delRef }){
         <div>
             <div className="flex justify-end flex-wrap px-2 py-3">
                 <div className="mb-2">
-                    <ButtonGroup 
-                        validList={filterList} 
+                    <ButtonGroup
+                        validList={filterList}
                         currentState={currFilter}
                         callBackState={setCurrFilter}
                     />
                 </div>
                 <div className="mb-2">
-                    <ButtonGroup 
-                        validList={sortList} 
+                    <ButtonGroup
+                        validList={sortList}
                         currentState={currSort}
                         callBackState={setCurrSort}
                     />
                 </div>
             </div>
-            <ul className="my-grid">
-                {fEntries.length > 0 ? fEntries.map((item) => (<DrawImage key={item.id} item={item} onRequestDelete={setPendingDeleteId} />)) : <li className="col-span-12 w-full py-4 px-6 rounded-md -bg--surface-bright">No items to display</li>}
+            <ul className="masonry-grid">
+                {fEntries.length > 0 ? fEntries.map((item) => (<DrawImage key={item.id} item={item} onRequestDelete={setPendingDeleteId} onSaveItem={updateRef} />)) : <li className="w-full py-4 px-6 rounded-md -bg--surface-bright">No items to display</li>}
             </ul>
             <ConfirmationModal
                 isOpen={Boolean(pendingDeleteId)}
@@ -55,28 +56,136 @@ export default function ImageItems({ entries, delRef }){
     );
 }
 
-function DrawImage({ item, onRequestDelete }){
+function DrawImage({ item, onRequestDelete, onSaveItem }){
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState(item.title);
+    const [editPath, setEditPath] = useState(item.path);
+    const [editNote, setEditNote] = useState(item.note);
+
+    const startEditing = () => {
+        setEditTitle(item.title);
+        setEditPath(item.path);
+        setEditNote(item.note);
+        setIsEditing(true);
+    };
+
+    const cancelEditing = () => {
+        setEditTitle(item.title);
+        setEditPath(item.path);
+        setEditNote(item.note);
+        setIsEditing(false);
+    };
+
+    const saveEditing = () => {
+        const trimmedTitle = editTitle.trim();
+
+        if (trimmedTitle === '') {
+            return;
+        }
+
+        onSaveItem({
+            ...item,
+            title: trimmedTitle,
+            path: editPath,
+            note: editNote,
+        });
+        setIsEditing(false);
+    };
+
+    const handleEditImageChange = (event) => {
+        const files = event.target.files;
+
+        if (!files || files.length === 0) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(files[0]);
+        reader.onload = () => {
+            setEditPath(reader.result);
+        };
+    };
+
     return(
-        <li className="col-span-12 lg:col-span-6 flex flex-col gap-4 w-full py-4 px-4 rounded-md -bg--surface-bright" key={item.id}>
+        <li className="masonry-grid-item gap-2 py-4 px-4 rounded-md -bg--surface-container" key={item.id}>
             <div>
                 <div className="flex justify-between items-center">
                     <p className="text-xs">
                         {retDateString(item.date)}
                     </p>
-                    <button
-                        type="button"
-                        className="p-1 border-0 bg-transparent cursor-pointer"
-                        onClick={() => onRequestDelete(item.id)}
-                    >
-                        <FontAwesomeIcon icon={faTrashCan} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                        {!isEditing &&
+                            <button
+                                type="button"
+                                className="p-1 border-0 bg-transparent cursor-pointer"
+                                onClick={startEditing}
+                                aria-label="Edit image entry"
+                            >
+                                <FontAwesomeIcon icon={faPenToSquare} />
+                            </button>
+                        }
+                        <button
+                            type="button"
+                            className="p-1 border-0 bg-transparent cursor-pointer"
+                            onClick={() => onRequestDelete(item.id)}
+                            aria-label="Delete image entry"
+                        >
+                            <FontAwesomeIcon icon={faTrashCan} />
+                        </button>
+                    </div>
                 </div>
-                <p className="inline-block py-1 px-4 text-xs rounded-full -text--on-primary-container -bg--primary-container">{item.category}</p>
+                <Pill category={item.category}/>
             </div>
             <div>
-                <h2 className="font-medium text-lg">{item.title}</h2>
-                <img className="w-3/5 mx-auto" src={item.path} alt={item.title} />
-                <p className="font-normal">{item.note}</p>
+                {isEditing ? (
+                    <div className="flex flex-col gap-2">
+                        <input
+                            className="w-full py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                            value={editTitle}
+                            onChange={(event) => setEditTitle(event.target.value)}
+                            placeholder="Enter Title"
+                        />
+                        <div className="flex flex-col justify-center min-h-24 items-center bg-white rounded-sm">
+                            {!!editPath && <img className="w-full max-w-96 mx-auto rounded-sm object-cover" src={editPath} alt={editTitle} />}
+                            <input
+                                className="mx-auto px-4 py-2"
+                                type="file"
+                                accept="image/png, image/jpg, image/webp, image/jpeg, image/gif, image/svg"
+                                onChange={handleEditImageChange}
+                            />
+                        </div>
+                        <input
+                            className="w-full py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                            value={editNote}
+                            onChange={(event) => setEditNote(event.target.value)}
+                            placeholder="Enter Note"
+                        />
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                className="button button-secondary"
+                                onClick={cancelEditing}
+                                aria-label="Cancel editing image entry"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="button button-primary"
+                                onClick={saveEditing}
+                                aria-label="Save image entry"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-2">
+                        <h2 className="font-medium text-lg">{item.title}</h2>
+                        <img className="w-full max-w-96 mx-auto rounded-sm object-cover" src={item.path} alt={item.title} />
+                        <p className="font-normal">{item.note}</p>
+                    </div>
+                )}
             </div>
         </li>
     )
@@ -88,7 +197,7 @@ function sortAndFilterList(entries, currFilter, currSort) {
     // console.log('Current Sort:', currSort);
     return entries
         .filter((cItem) => {
-            return cItem.category === currFilter || currFilter === 'All';
+            return cItem.category?.toLowerCase() === currFilter.toLowerCase() || currFilter === 'All';
         })
         .sort((a, b) => {
             if (currSort === "Text") {
@@ -107,9 +216,9 @@ function sortAndFilterList(entries, currFilter, currSort) {
                 else
                     return -1;
             }
-            
+
         })
-        
+
 }
 
 function retDateString(timestamp) {

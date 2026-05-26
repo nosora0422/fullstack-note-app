@@ -10,6 +10,9 @@ import {
   getGuestStorageKey,
   getUserStorageKey,
 } from "../utils/storage";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
+import Footer from "../shared/Footer/Footer";
 
 const DATA_TYPES = [
   { label: "Notes", type: "notes" },
@@ -102,11 +105,13 @@ export default function Settings() {
               className="button button-tertiary w-full"
               onClick={logout}
             >
+              <FontAwesomeIcon icon={faPowerOff} className="mr-2" />
               Logout
             </button>
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

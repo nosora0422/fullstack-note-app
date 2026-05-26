@@ -1,7 +1,6 @@
 import './dist/output.css'
 import { useEffect } from "react";
 import Header from "./shared/Header/Header";
-import Footer from "./shared/Footer/Footer";
 import { Outlet, useLocation } from "react-router-dom";
 import { clearGuestData, getAppMode } from "./utils/storage";
 
@@ -36,7 +35,6 @@ function App() {
           <Outlet />
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

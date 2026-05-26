@@ -30,7 +30,7 @@ export default function ConfirmationModal({
                 <div className="flex justify-end gap-2">
                     <button
                         type="button"
-                        className="button button-tertiary"
+                        className="button button-secondary"
                         onClick={onCancel}
                     >
                         {cancelLabel}

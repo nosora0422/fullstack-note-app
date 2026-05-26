@@ -1,10 +1,11 @@
 import { useState } from "react";
 import ButtonGroup from "../../ButtonGroup/ButtonGroup";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
+import Pill from "../../Pill/Pill";
 
-export default function NoteItems({ entries, delRef }){
+export default function NoteItems({ entries, delRef, updateRef }){
     const [currFilter, setCurrFilter] = useState('All');
     const filterList = ['All', 'School', 'Work', 'Personal'];
 
@@ -27,22 +28,22 @@ export default function NoteItems({ entries, delRef }){
         <div>
             <div className="flex justify-end flex-wrap px-2 py-3">
                 <div className="mb-2">
-                    <ButtonGroup 
-                        validList={filterList} 
+                    <ButtonGroup
+                        validList={filterList}
                         currentState={currFilter}
                         callBackState={setCurrFilter}
                     />
                 </div>
                 <div className="mb-2">
-                    <ButtonGroup 
-                        validList={sortList} 
+                    <ButtonGroup
+                        validList={sortList}
                         currentState={currSort}
                         callBackState={setCurrSort}
                     />
                 </div>
             </div>
-            <ul className="my-grid">
-                {fEntries.length > 0 ? fEntries.map((item) => (<Note key={item.id} item={item} onRequestDelete={setPendingDeleteId} />)) : <li className="col-span-12 w-full py-4 px-6 rounded-md -bg--surface-bright">No items to display</li>}
+            <ul className="masonry-grid">
+                {fEntries.length > 0 ? fEntries.map((item) => (<Note key={item.id} item={item} onRequestDelete={setPendingDeleteId} onSaveItem={updateRef} />)) : <li className="w-full py-4 px-6 rounded-md -bg--surface-bright">No items to display</li>}
             </ul>
             <ConfirmationModal
                 isOpen={Boolean(pendingDeleteId)}
@@ -55,27 +56,108 @@ export default function NoteItems({ entries, delRef }){
     );
 }
 
-function Note({ item, onRequestDelete }){
+function Note({ item, onRequestDelete, onSaveItem }){
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState(item.title);
+    const [editNote, setEditNote] = useState(item.note);
+
+    const startEditing = () => {
+        setEditTitle(item.title);
+        setEditNote(item.note);
+        setIsEditing(true);
+    };
+
+    const cancelEditing = () => {
+        setEditTitle(item.title);
+        setEditNote(item.note);
+        setIsEditing(false);
+    };
+
+    const saveEditing = () => {
+        const trimmedTitle = editTitle.trim();
+
+        if (trimmedTitle === '') {
+            return;
+        }
+
+        onSaveItem({
+            ...item,
+            title: trimmedTitle,
+            note: editNote,
+        });
+        setIsEditing(false);
+    };
+
     return(
-        <li className="col-span-12 lg:col-span-6 flex flex-col gap-4 w-full py-4 px-4 rounded-md -bg--surface-bright" key={item.id}>
+        <li className="masonry-grid-item gap-2 py-4 px-4 rounded-md -bg--surface-container" key={item.id}>
             <div>
                 <div className="flex justify-between items-center">
                     <p className="text-xs">
                         {retDateString(item.date)}
                     </p>
-                    <button
-                        type="button"
-                        className="p-1 border-0 bg-transparent cursor-pointer"
-                        onClick={() => onRequestDelete(item.id)}
-                    >
-                        <FontAwesomeIcon icon={faTrashCan} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                        {!isEditing &&
+                            <button
+                                type="button"
+                                className="p-1 border-0 bg-transparent cursor-pointer"
+                                onClick={startEditing}
+                                aria-label="Edit note"
+                            >
+                                <FontAwesomeIcon icon={faPenToSquare} />
+                            </button>
+                        }
+                        <button
+                            type="button"
+                            className="p-1 border-0 bg-transparent cursor-pointer"
+                            onClick={() => onRequestDelete(item.id)}
+                            aria-label="Delete note"
+                        >
+                            <FontAwesomeIcon icon={faTrashCan} />
+                        </button>
+                    </div>
                 </div>
-                <p className="inline-block py-1 px-4 text-xs rounded-full -text--on-primary-container -bg--primary-container">{item.category}</p>
+                <Pill category={item.category} />
             </div>
             <div>
-                <h2 className="font-medium text-lg">{item.title}</h2>
-                <p className="font-normal">{item.note}</p>
+                {isEditing ? (
+                    <>
+                        <input
+                            className="w-full mb-2 py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                            value={editTitle}
+                            onChange={(event) => setEditTitle(event.target.value)}
+                            placeholder="Enter Title"
+                        />
+                        <textarea
+                            className="w-full min-h-32 py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none font-Roboto"
+                            value={editNote}
+                            onChange={(event) => setEditNote(event.target.value)}
+                            placeholder="Enter Note"
+                        />
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                className="button button-secondary"
+                                onClick={cancelEditing}
+                                aria-label="Cancel editing note"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="button button-primary"
+                                onClick={saveEditing}
+                                aria-label="Save note"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h2 className="font-medium text-lg">{item.title}</h2>
+                        <p className="font-normal whitespace-pre-wrap">{item.note}</p>
+                    </>
+                )}
             </div>
         </li>
     )
@@ -87,7 +169,7 @@ function sortAndFilterList(entries, currFilter, currSort) {
     // console.log('Current Sort:', currSort);
     return entries
         .filter((cItem) => {
-            return cItem.category === currFilter || currFilter === 'All';
+            return cItem.category?.toLowerCase() === currFilter.toLowerCase() || currFilter === 'All';
         })
         .sort((a, b) => {
             if (currSort === "Text") {
@@ -106,9 +188,9 @@ function sortAndFilterList(entries, currFilter, currSort) {
                 else
                     return -1;
             }
-            
+
         })
-        
+
 }
 
 function retDateString(timestamp) {

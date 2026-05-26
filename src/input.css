@@ -21,6 +21,12 @@
     .my-grid{
         @apply grid grid-cols-12 gap-4;
     }
+    .masonry-grid{
+        @apply columns-1 gap-4 lg:columns-2;
+    }
+    .masonry-grid-item{
+        @apply flex flex-col w-full mb-4 break-inside-avoid;
+    }
     .container{
         @apply  py-4 px-6 mx-auto md:flex md:flex-col md:items-end md:max-w-screen-xl md:mx-auto md:p-8;
     }
@@ -37,7 +43,7 @@
         @apply py-3 px-3 mb-1 rounded-lg font-medium -text--on-primary -bg--primary;
     }
     .button{
-        @apply py-2 px-6 border-0 rounded-full text-center font-medium;
+        @apply w-full py-2 px-6 border-0 rounded-md text-center font-medium;
     }
 
     .button-primary {
@@ -45,10 +51,10 @@
     }
 
     .button-secondary {
-        @apply -bg--primary-container -text--on-primary-container hover:-bg--primary-container-hover;
+        @apply -bg--surface-container-highest -text--main-font-color hover:-bg--surface-container-highest-hover;
     }
     .button-tertiary {
-        @apply -bg--surface-container-highest -text--main-font-color hover:-bg--surface-container-highest-hover;
+        @apply  -text--on-primary-container hover:-bg--primary-container-hover;
     }
 
 }

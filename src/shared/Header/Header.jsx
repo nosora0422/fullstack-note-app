@@ -111,7 +111,7 @@ export default function Header(){
                         </Link>
                     </li>
                 </ul>
-                <button className="button button-tertiary w-full" onClick={logout}><FontAwesomeIcon icon={faPowerOff} className="mr-2" />Logout</button>
+                <button className="button button-secondary w-full" onClick={logout}><FontAwesomeIcon icon={faPowerOff} className="mr-2" />Logout</button>
             </nav>
         </header>
         </>
