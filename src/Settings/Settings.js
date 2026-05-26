@@ -88,6 +88,7 @@ export default function Settings() {
           <div className="w-full md:w-1/2 lg:w-1/3 flex flex-col gap-3">
             {DATA_TYPES.map(({ label, type }) => (
               <button
+                type="button"
                 className="button button-secondary w-full"
                 key={type}
                 onClick={() => clearDataType(type)}
@@ -96,12 +97,14 @@ export default function Settings() {
               </button>
             ))}
             <button
+              type="button"
               className="button button-primary w-full"
               onClick={clearAllCurrentData}
             >
               Clear All Saved Data
             </button>
             <button
+              type="button"
               className="button button-tertiary w-full"
               onClick={logout}
             >

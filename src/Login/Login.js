@@ -63,22 +63,30 @@ export default function Login(){
                         <div>
                             <div className='flex flex-col h-20 h-'>
                                 <label htmlFor='email'>Email</label>
-                                <input 
+                                <input
+                                    id="email"
                                     className="border border-solid -border--outline rounded py-2 px-3"
                                     name='email' 
                                     type='email'
+                                    autoComplete="email"
+                                    aria-invalid={Boolean(error.email)}
+                                    aria-describedby={error.email ? 'login-email-error' : undefined}
                                     onChange={(event)=>{setLoginEmail(event.target.value)}} 
                                     placeholder='youremail@example.com' 
                                 />
-                                {error.email && <p className='text-xs text-red-400'>{error.email}</p>}
+                                {error.email && <p id="login-email-error" className='text-xs text-red-700'>{error.email}</p>}
                             </div>
                             <div className='pt-4 flex flex-col h-20'>
                                 <label htmlFor='password'>Password</label>
                                 <div className="flex items-center border border-solid -border--outline rounded">
-                                    <input 
+                                    <input
+                                        id="password"
                                         className="w-full border-0 rounded py-2 px-3 focus:ring-0 focus:outline-none focus-visible:outline-none" 
                                         name='password'
                                         type={showPassword ? 'text' : 'password'}
+                                        autoComplete="current-password"
+                                        aria-invalid={Boolean(error.password)}
+                                        aria-describedby={error.password ? 'login-password-error' : undefined}
                                         onChange={(event)=>{setLoginPassword(event.target.value)}} 
                                         placeholder='Your password'
                                     />
@@ -91,20 +99,22 @@ export default function Login(){
                                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} size="lg"/>
                                     </button>
                                 </div>
-                                {error.password && <p className='text-xs text-red-400'>{error.password}</p>}
+                                {error.password && <p id="login-password-error" className='text-xs text-red-700'>{error.password}</p>}
                             </div>
-                            {error.form && <p className='mt-4 text-sm text-red-400'>{error.form}</p>}
+                            {error.form && <p className='mt-4 text-sm text-red-700' role="alert">{error.form}</p>}
                             <button 
+                                type="button"
                                 className='button w-full mt-8 -bg--primary -text--on-primary rounded'
                                 onClick={login}
                             >
                                 Log in
                             </button>
                             <button
+                                type="button"
                                 className='button w-full mt-4 -bg--primary-container -text--on-primary-container rounded flex items-center justify-center gap-3'
                                 onClick={loginWithGoogle}
                             >
-                                <img src={googleLogo} alt="Google" className="w-5 h-5"/>
+                                <img src={googleLogo} alt="" className="w-5 h-5" aria-hidden="true"/>
                                 Sign in with Google
                             </button>
                         </div>

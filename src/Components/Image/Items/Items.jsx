@@ -32,6 +32,7 @@ export default function ImageItems({ entries, delRef, updateRef }){
                         validList={filterList}
                         currentState={currFilter}
                         callBackState={setCurrFilter}
+                        label="Filter images by category"
                     />
                 </div>
                 <div className="mb-2">
@@ -39,6 +40,7 @@ export default function ImageItems({ entries, delRef, updateRef }){
                         validList={sortList}
                         currentState={currSort}
                         callBackState={setCurrSort}
+                        label="Sort images"
                     />
                 </div>
             </div>
@@ -140,6 +142,7 @@ function DrawImage({ item, onRequestDelete, onSaveItem }){
                 {isEditing ? (
                     <div className="flex flex-col gap-2">
                         <input
+                            aria-label="Edit image title"
                             className="w-full py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                             value={editTitle}
                             onChange={(event) => setEditTitle(event.target.value)}
@@ -148,6 +151,7 @@ function DrawImage({ item, onRequestDelete, onSaveItem }){
                         <div className="flex flex-col justify-center min-h-24 items-center bg-white rounded-sm">
                             {!!editPath && <img className="w-full max-w-96 mx-auto rounded-sm object-cover" src={editPath} alt={editTitle} />}
                             <input
+                                aria-label="Replace image"
                                 className="mx-auto px-4 py-2"
                                 type="file"
                                 accept="image/png, image/jpg, image/webp, image/jpeg, image/gif, image/svg"
@@ -155,6 +159,7 @@ function DrawImage({ item, onRequestDelete, onSaveItem }){
                             />
                         </div>
                         <input
+                            aria-label="Edit image note"
                             className="w-full py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                             value={editNote}
                             onChange={(event) => setEditNote(event.target.value)}

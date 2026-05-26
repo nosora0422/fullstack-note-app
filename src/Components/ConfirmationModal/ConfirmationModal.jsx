@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 export default function ConfirmationModal({
     isOpen,
     title = "Confirm Delete",
@@ -7,6 +9,9 @@ export default function ConfirmationModal({
     onConfirm,
     onCancel,
 }) {
+    const titleId = useId();
+    const messageId = useId();
+
     if (!isOpen) {
         return null;
     }
@@ -23,10 +28,11 @@ export default function ConfirmationModal({
                 className="relative z-10 w-full max-w-sm rounded-md bg-white p-5 shadow-xl"
                 role="dialog"
                 aria-modal="true"
-                aria-label={title}
+                aria-labelledby={titleId}
+                aria-describedby={messageId}
             >
-                <h3 className="text-lg font-semibold mb-2">{title}</h3>
-                <p className="text-sm mb-5">{message}</p>
+                <h3 id={titleId} className="text-lg font-semibold mb-2">{title}</h3>
+                <p id={messageId} className="text-sm mb-5">{message}</p>
                 <div className="flex justify-end gap-2">
                     <button
                         type="button"

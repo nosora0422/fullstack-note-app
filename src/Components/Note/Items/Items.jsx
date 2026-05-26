@@ -32,6 +32,7 @@ export default function NoteItems({ entries, delRef, updateRef }){
                         validList={filterList}
                         currentState={currFilter}
                         callBackState={setCurrFilter}
+                        label="Filter notes by category"
                     />
                 </div>
                 <div className="mb-2">
@@ -39,6 +40,7 @@ export default function NoteItems({ entries, delRef, updateRef }){
                         validList={sortList}
                         currentState={currSort}
                         callBackState={setCurrSort}
+                        label="Sort notes"
                     />
                 </div>
             </div>
@@ -122,12 +124,14 @@ function Note({ item, onRequestDelete, onSaveItem }){
                 {isEditing ? (
                     <>
                         <input
+                            aria-label="Edit note title"
                             className="w-full mb-2 py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                             value={editTitle}
                             onChange={(event) => setEditTitle(event.target.value)}
                             placeholder="Enter Title"
                         />
                         <textarea
+                            aria-label="Edit note text"
                             className="w-full min-h-32 py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none font-Roboto"
                             value={editNote}
                             onChange={(event) => setEditNote(event.target.value)}

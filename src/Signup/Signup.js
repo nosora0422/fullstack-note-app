@@ -63,37 +63,49 @@ export default function Signup(){
                     <div>
                         <div className="pt-4 flex flex-col">
                             <label htmlFor='name'>Name</label>
-                            <input 
+                            <input
+                                id="name"
                                 className="border border-solid -border--outline rounded py-2 px-3" 
                                 name="name"
                                 type="text"
+                                autoComplete="name"
+                                aria-invalid={Boolean(error.name)}
+                                aria-describedby={error.name ? 'signup-name-error' : undefined}
                                 onChange={(event) => {
                                     setRegisterName(event.target.value)
                                 }} 
                                 placeholder="Your Name" 
                             />
-                            {error.name && <p className='text-xs text-red-400'>{error.name}</p>}
+                            {error.name && <p id="signup-name-error" className='text-xs text-red-700'>{error.name}</p>}
                         </div>
                         <div className='pt-4 flex flex-col'>
                             <label htmlFor='email'>Email</label>
-                            <input 
+                            <input
+                                id="email"
                                 className="border border-solid -border--outline rounded py-2 px-3" 
                                 name="email"
                                 type='email'
+                                autoComplete="email"
+                                aria-invalid={Boolean(error.email)}
+                                aria-describedby={error.email ? 'signup-email-error' : undefined}
                                 onChange={(event) => {
                                     setRegisterEmail(event.target.value)
                                 }} 
                                 placeholder='youremail@example.com' 
                             />
-                            {error.email && <p className='text-xs text-red-400'>{error.email}</p>}
+                            {error.email && <p id="signup-email-error" className='text-xs text-red-700'>{error.email}</p>}
                         </div>
                         <div className='pt-4 flex flex-col'>
                             <label htmlFor='password'>Password</label>
                             <div className="flex items-center border border-solid -border--outline rounded">
-                                <input 
+                                <input
+                                    id="password"
                                     className="w-full border-0 rounded py-2 px-3 focus:ring-0 focus:outline-none focus-visible:outline-none" 
                                     name="password"
                                     type={showPassword ? 'text' : 'password'}
+                                    autoComplete="new-password"
+                                    aria-invalid={Boolean(error.password)}
+                                    aria-describedby={error.password ? 'signup-password-error' : undefined}
                                     onChange={(event) => {
                                         setPassword(event.target.value)
                                     }} 
@@ -108,15 +120,19 @@ export default function Signup(){
                                     <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} size="lg"/>
                                 </button>
                             </div>
-                            {error.password && <p className='text-xs text-red-400'>{error.password}</p>}
+                            {error.password && <p id="signup-password-error" className='text-xs text-red-700'>{error.password}</p>}
                         </div>
                         <div className='py-4 flex flex-col'>
-                            <label htmlFor='password'>Confirm Password</label>
+                            <label htmlFor='passwordConfirm'>Confirm Password</label>
                             <div className="flex items-center border border-solid -border--outline rounded">
-                                <input 
+                                <input
+                                    id="passwordConfirm"
                                     className="w-full border-0 rounded py-2 px-3 focus:ring-0 focus:outline-none focus-visible:outline-none" 
                                     name="passwordConfirm"
                                     type={showConfirmPassword ? 'text' : 'password'}
+                                    autoComplete="new-password"
+                                    aria-invalid={Boolean(error.passwordConfirm)}
+                                    aria-describedby={error.passwordConfirm ? 'signup-password-confirm-error' : undefined}
                                     onChange={(event) => {
                                             setRegisterPassword(event.target.value)
                                     }}
@@ -131,10 +147,11 @@ export default function Signup(){
                                     <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} size="lg"/>
                                 </button>
                             </div>
-                            {error.passwordConfirm && <p className='text-xs text-red-400'>{error.passwordConfirm}</p>}
+                            {error.passwordConfirm && <p id="signup-password-confirm-error" className='text-xs text-red-700'>{error.passwordConfirm}</p>}
                         </div>
-                        {error.form && <p className='mb-4 text-sm text-red-400'>{error.form}</p>}
+                        {error.form && <p className='mb-4 text-sm text-red-700' role="alert">{error.form}</p>}
                         <button
+                            type="button"
                             className='button button-primary mt-4 rounded w-full'
                             onClick={register}
                         >

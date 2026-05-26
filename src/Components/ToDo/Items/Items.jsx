@@ -35,6 +35,7 @@ export default function ToDoItems({ entries, delRef, updateRef }){
                         validList={filterList}
                         currentState={currFilter}
                         callBackState={setCurrFilter}
+                        label="Filter to-do items by category"
                     />
                 </div>
                 <div className="mb-2">
@@ -42,6 +43,7 @@ export default function ToDoItems({ entries, delRef, updateRef }){
                         validList={sortList}
                         currentState={currSort}
                         callBackState={setCurrSort}
+                        label="Sort to-do items"
                     />
                 </div>
             </div>
@@ -167,6 +169,7 @@ function Task({ item, onRequestDelete, onSaveItem }){
             <div>
                 {isEditing ? (
                     <input
+                        aria-label="Edit to-do title"
                         className="w-full mb-2 py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                         value={editTitle}
                         onChange={(event) => setEditTitle(event.target.value)}
@@ -181,14 +184,19 @@ function Task({ item, onRequestDelete, onSaveItem }){
                         <li
                         className="flex items-center py-1 font-normal"
                         key={task.id || index}>
-                            <FontAwesomeIcon
-                                icon={isChecked[index] ? checked : unchecked}
-                                onClick={()=>toggleIcon(index)}
-                                className="mr-2 -text--secondary shrink-0"
-                            />
+                            <button
+                                type="button"
+                                className="mr-2 p-0 border-0 bg-transparent -text--secondary shrink-0 cursor-pointer"
+                                onClick={() => toggleIcon(index)}
+                                aria-pressed={isChecked[index]}
+                                aria-label={`${isChecked[index] ? 'Mark incomplete' : 'Mark complete'}: ${task.task || `task ${index + 1}`}`}
+                            >
+                                <FontAwesomeIcon icon={isChecked[index] ? checked : unchecked} aria-hidden="true" />
+                            </button>
                             {isEditing ? (
                                 <div className="w-full flex items-center bg-white rounded-sm">
                                     <input
+                                        aria-label={`Edit task ${index + 1}`}
                                         className="w-full py-1 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                                         value={task.task}
                                         onChange={(event) => handleTaskChange(index, event.target.value)}
@@ -198,7 +206,7 @@ function Task({ item, onRequestDelete, onSaveItem }){
                                         type="button"
                                         className="p-2 border-0 bg-transparent cursor-pointer"
                                         onClick={() => deleteEditTask(task.id)}
-                                        aria-label="Delete task"
+                                        aria-label={`Delete task ${index + 1}`}
                                     >
                                         <FontAwesomeIcon icon={faTrashCan} />
                                     </button>

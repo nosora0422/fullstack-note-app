@@ -72,7 +72,9 @@ export default function List({ searchTerm }){
                     <div className="th-min p-4 rounded-md -bg--surface-container">
                         <div className="flex flex-col gap-2">
                             <select
+                                id="note-category"
                                 name="category"
+                                aria-label="Note category"
                                 className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none"
                                 value={categoryVal}
                                 onChange={event => {
@@ -85,6 +87,8 @@ export default function List({ searchTerm }){
                             </select>
                             <div className="flex items-center bg-white rounded-sm">
                                 <input
+                                    id="note-title"
+                                    aria-label="Note title"
                                     className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none"
                                     value={titleVal}
                                     onChange={(event) => {
@@ -95,6 +99,8 @@ export default function List({ searchTerm }){
                             </div>
                             <div className="iflex items-center bg-white rounded-sm">
                                 <textarea
+                                    id="note-body"
+                                    aria-label="Note text"
                                     className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none font-Roboto h-52"
                                     value={textVal}
                                     onChange={(event) => {setTextVal(event.target.value);
@@ -104,7 +110,7 @@ export default function List({ searchTerm }){
                             </div>
                             <button
                                 className={`button button-primary ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                type="submit"
+                                type="button"
                                 disabled={isCreateDisabled}
                                 onClick={() => addItem()}
                             >

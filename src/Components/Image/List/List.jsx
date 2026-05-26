@@ -74,7 +74,9 @@ export default function ImageList({ searchTerm }) {
           <div className="h-min p-4 rounded-md -bg--surface-container">
             <div className="flex flex-col gap-2">
               <select
+                id="image-category"
                 name="category"
+                aria-label="Image category"
                 className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none"
                 value={categoryVal}
                 onChange={(event) => {
@@ -87,6 +89,8 @@ export default function ImageList({ searchTerm }) {
               </select>
               <div className="flex items-center bg-white rounded-sm">
                 <input
+                  id="image-title"
+                  aria-label="Image title"
                   className="w-full mx-2 py-2 px-2 border-none focus:ring-0 focus:outline-none focus-visible:outline-none"
                   value={titleVal}
                   onChange={(event) => {
@@ -98,6 +102,8 @@ export default function ImageList({ searchTerm }) {
               <div className="flex flex-col justify-center min-h-24 items-center bg-white rounded-sm">
                 {!!imagePath && <img src={imagePath} className=" w-3/5 object-center object-cover" alt={titleVal} />}
                 <input
+                  id="image-file"
+                  aria-label="Upload image"
                   className="mx-auto px-4"
                   type="file"
                   accept="image/png, image/jpg, image/webp, image/jpeg, image/gif, image/svg"
@@ -120,6 +126,8 @@ export default function ImageList({ searchTerm }) {
               </div>
               <div className="flex items-center bg-white rounded-sm">
                 <input
+                  id="image-note"
+                  aria-label="Image note"
                   className="w-full mx-2 py-2 px-2 border-none focus:ring-0 focus:outline-none focus-visible:outline-none"
                   value={textVal}
                   onChange={(event) => {
@@ -130,7 +138,7 @@ export default function ImageList({ searchTerm }) {
               </div>
                 <button
                   className={`button button-primary ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  type="submit"
+                  type="button"
                   disabled={isCreateDisabled}
                   onClick={() => addItem()}
                 >

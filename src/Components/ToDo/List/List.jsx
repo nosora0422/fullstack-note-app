@@ -109,7 +109,9 @@ export default function List({ searchTerm }){
                     <div className="h-min p-4 rounded-md -bg--surface-container">
                         <div className="flex flex-col gap-2">
                             <select
+                                id="todo-category"
                                 name="category"
+                                aria-label="To-do category"
                                 className="w-full py-2 px-4 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                                 value={categoryVal}
                                 onChange={event => {
@@ -122,6 +124,8 @@ export default function List({ searchTerm }){
                             </select>
                             <div className="flex items-center bg-white rounded-sm">
                                 <input
+                                    id="todo-title"
+                                    aria-label="To-do title"
                                     className="w-full mx-2 py-2 px-2 border-0 focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                                     value={titleVal}
                                     onChange={(event) => {
@@ -134,6 +138,7 @@ export default function List({ searchTerm }){
                                 <div className="flex items-center bg-white rounded-sm" key={index}>
                                     <FontAwesomeIcon icon={regularSquare} className="ml-4 -text--secondary"/>
                                     <input
+                                        aria-label={`Task ${index + 1}`}
                                         className="w-full mx-2 py-2 px-2 border-0 focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                                         value={task}
                                         onChange={(event) => handleTaskChange(index, event.target.value)}
@@ -141,8 +146,10 @@ export default function List({ searchTerm }){
                                     />
                                     {index > 0 && (
                                         <button
+                                            type="button"
                                             className="p-2 border-0 bg-transparent cursor-pointer"
                                             onClick={() => setPendingTaskDeleteIndex(index)}
+                                            aria-label={`Remove task ${index + 1}`}
                                         ><FontAwesomeIcon icon={faTrashCan} />
                                         </button>
                                     )}
@@ -150,7 +157,7 @@ export default function List({ searchTerm }){
                             ))}
                             <div className="w-full flex flex-col gap-2">
                                 <button
-                                    type="submit"
+                                    type="button"
                                     className="button button-tertiary rounded-sm mt-2 "
                                     onClick={addTaskInput}
                                 >
@@ -158,7 +165,7 @@ export default function List({ searchTerm }){
                                 </button>
                                 <button
                                     className={`button button-primary ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    type="submit"
+                                    type="button"
                                     disabled={isCreateDisabled}
                                     onClick={() => addItem()}
                                 >

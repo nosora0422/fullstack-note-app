@@ -14,7 +14,7 @@ module.exports = {
         '--primary-container': '#f0f1ee',
         '--primary-container-hover': '#f0f1ee',
         '--secondary-container':' #C0D0B4',
-        '--on-primary-container': '#052100a3',
+        '--on-primary-container': '#052100',
         '--secondary': '#55624C',
         '--outline': '#73796E',
         '--outline-variation': '#C3C8BB',
