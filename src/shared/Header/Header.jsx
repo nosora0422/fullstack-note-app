@@ -98,7 +98,10 @@ export default function Header(){
                     
             </nav>
             <nav className="fixed top-0 left-0 w-2/12 min-w-[164px] hidden md:flex md:flex-col h-screen py-10 px-4 bg-white drop-shadow-xl">
-                <p className="text-xl">Hi, {user ? user.displayName || "Guest" : "Guest"}!</p>
+                <p className="text-xl">
+                    <span aria-hidden="true">👋 </span>
+                    Hi, {user ? user.displayName || "Guest" : "Guest"}!
+                </p>
                 <p className="text-3xl mb-10">Note App</p>
                 <ul className="flex flex-col flex-grow h-40">
                     <li>
