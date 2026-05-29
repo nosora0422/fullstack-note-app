@@ -2,6 +2,11 @@ import { useEffect, useId, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
+const DROPDOWN_TYPES = {
+    primary: "flex w-full items-center justify-between rounded-md bg-white py-2 px-4 text-left -text--main-font-color hover:-border--outline focus:ring-0 focus:outline-none focus-visible:outline-none",
+    secondary: "flex w-full items-center justify-between px-3 md:px-4 md:py-1 mr-2 border border-solid rounded-full md:text-md -bg--white -text--main-font-color",
+};
+
 export default function Dropdown({
     id,
     name,
@@ -9,6 +14,7 @@ export default function Dropdown({
     options,
     value,
     onChange,
+    type = 'primary'
 }) {
     const listboxId = useId();
     const dropdownRef = useRef(null);
@@ -62,12 +68,14 @@ export default function Dropdown({
         selectOption(options[nextIndex].value);
     };
 
+    const dropdownClasses = DROPDOWN_TYPES[type] || DROPDOWN_TYPES.primary;
+
     return (
         <div className="relative w-full" ref={dropdownRef}>
             <input type="hidden" id={id} name={name} value={value}/>
             <button
                 type="button"
-                className="flex w-full items-center justify-between rounded-md bg-white py-2 px-4 text-left -text--main-font-color hover:-border--outline focus:ring-0 focus:outline-none focus-visible:outline-none"
+                className={dropdownClasses}
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
                 aria-controls={listboxId}

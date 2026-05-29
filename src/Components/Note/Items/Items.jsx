@@ -4,13 +4,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
 import Pill from "../../Pill/Pill";
+import Dropdown from "../../Dropdown/Dropdown";
+
+const SORT_OPTIONS = [
+    { value: "Creation Date", label: "Creation Date" },
+    { value: "Title", label: "Title" },
+];
+
+const CATEGORY_OPTIONS = [
+    { value: "Personal", label: "Personal" },
+    { value: "School", label: "School" },
+    { value: "Work", label: "Work" },
+];
 
 export default function NoteItems({ entries, delRef, updateRef }){
     const [currFilter, setCurrFilter] = useState('All');
     const filterList = ['All', 'School', 'Work', 'Personal'];
 
     const [currSort, setCurrSort] = useState('Creation Date');
-    const sortList = ['Creation Date', 'Title'];
     const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
     const fEntries = sortAndFilterList(entries, currFilter, currSort);
@@ -35,12 +46,15 @@ export default function NoteItems({ entries, delRef, updateRef }){
                         label="Filter notes by category"
                     />
                 </div>
-                <div className="mb-2">
-                    <ButtonGroup
-                        validList={sortList}
-                        currentState={currSort}
-                        callBackState={setCurrSort}
+                <div className="mb-2 w-full sm:w-48">
+                    <Dropdown
+                        id="note-sort"
+                        name="note-sort"
                         label="Sort notes"
+                        options={SORT_OPTIONS}
+                        value={currSort}
+                        onChange={setCurrSort}
+                        type="secondary"
                     />
                 </div>
             </div>
@@ -61,16 +75,19 @@ export default function NoteItems({ entries, delRef, updateRef }){
 function Note({ item, onRequestDelete, onSaveItem }){
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(item.title);
+    const [editCategory, setEditCategory] = useState(item.category || 'Personal');
     const [editNote, setEditNote] = useState(item.note);
 
     const startEditing = () => {
         setEditTitle(item.title);
+        setEditCategory(item.category || 'Personal');
         setEditNote(item.note);
         setIsEditing(true);
     };
 
     const cancelEditing = () => {
         setEditTitle(item.title);
+        setEditCategory(item.category || 'Personal');
         setEditNote(item.note);
         setIsEditing(false);
     };
@@ -85,6 +102,7 @@ function Note({ item, onRequestDelete, onSaveItem }){
         onSaveItem({
             ...item,
             title: trimmedTitle,
+            category: editCategory,
             note: editNote,
         });
         setIsEditing(false);
@@ -122,10 +140,18 @@ function Note({ item, onRequestDelete, onSaveItem }){
                     <>
                         <input
                             aria-label="Edit note title"
-                            className="w-full mb-2 py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                            className="w-full py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                             value={editTitle}
                             onChange={(event) => setEditTitle(event.target.value)}
                             placeholder="Enter Title"
+                        />
+                        <Dropdown
+                            id={`note-category-${item.id}`}
+                            name="category"
+                            label="Edit note category"
+                            options={CATEGORY_OPTIONS}
+                            value={editCategory}
+                            onChange={setEditCategory}
                         />
                         <textarea
                             aria-label="Edit note text"
@@ -193,4 +219,3 @@ function sortAndFilterList(entries, currFilter, currSort) {
         })
 
 }
-

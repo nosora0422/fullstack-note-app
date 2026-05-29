@@ -7,13 +7,25 @@ import { faSquareCheck as checked }from '@fortawesome/free-solid-svg-icons';
 import { faSquare as unchecked} from '@fortawesome/free-regular-svg-icons';
 import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
 import Pill from "../../Pill/Pill";
+import Dropdown from "../../Dropdown/Dropdown";
+
+const SORT_OPTIONS = [
+    { value: "Due Date", label: "Due Date" },
+    { value: "Creation Date", label: "Creation Date" },
+    { value: "Title", label: "Title" },
+];
+
+const CATEGORY_OPTIONS = [
+    { value: "Personal", label: "Personal" },
+    { value: "School", label: "School" },
+    { value: "Work", label: "Work" },
+];
 
 export default function ToDoItems({ entries, delRef, updateRef }){
     const [currFilter, setCurrFilter] = useState('All');
     const filterList = ['All', 'School', 'Work', 'Personal'];
 
     const [currSort, setCurrSort] = useState('Due Date');
-    const sortList = ['Due Date', 'Creation Date', 'Title'];
     const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
     const fEntries = sortAndFilterList(entries, currFilter, currSort);
@@ -38,12 +50,15 @@ export default function ToDoItems({ entries, delRef, updateRef }){
                         label="Filter to-do items by category"
                     />
                 </div>
-                <div className="mb-2">
-                    <ButtonGroup
-                        validList={sortList}
-                        currentState={currSort}
-                        callBackState={setCurrSort}
+                <div className="mb-2 w-full sm:w-48">
+                    <Dropdown
+                        id="todo-sort"
+                        name="todo-sort"
                         label="Sort to-do items"
+                        options={SORT_OPTIONS}
+                        value={currSort}
+                        onChange={setCurrSort}
+                        type="secondary"
                     />
                 </div>
             </div>
@@ -72,6 +87,7 @@ function Task({ item, onRequestDelete, onSaveItem }){
     const [isChecked, setIsChecked] = useState(getCheckedTasks(item.tasks));
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(item.title);
+    const [editCategory, setEditCategory] = useState(item.category || 'Personal');
     const [editDueDate, setEditDueDate] = useState(item.dueDate || '');
     const [editTasks, setEditTasks] = useState(createTaskDrafts(item.tasks));
     const [pendingEditTaskDeleteId, setPendingEditTaskDeleteId] = useState(null);
@@ -103,6 +119,7 @@ function Task({ item, onRequestDelete, onSaveItem }){
 
     const startEditing = () => {
         setEditTitle(item.title);
+        setEditCategory(item.category || 'Personal');
         setEditDueDate(item.dueDate || '');
         setEditTasks(createTaskDrafts(item.tasks));
         setIsEditing(true);
@@ -110,6 +127,7 @@ function Task({ item, onRequestDelete, onSaveItem }){
 
     const cancelEditing = () => {
         setEditTitle(item.title);
+        setEditCategory(item.category || 'Personal');
         setEditDueDate(item.dueDate || '');
         setEditTasks(createTaskDrafts(item.tasks));
         setPendingEditTaskDeleteId(null);
@@ -159,6 +177,7 @@ function Task({ item, onRequestDelete, onSaveItem }){
         onSaveItem({
             ...item,
             title: trimmedTitle,
+            category: editCategory,
             dueDate: editDueDate,
             tasks: editTasks.map((task) => ({
                 id: task.id,
@@ -213,6 +232,25 @@ function Task({ item, onRequestDelete, onSaveItem }){
                 </div>
             </div>
             <div className="flex flex-col gap-2">
+                {isEditing &&
+                    <Dropdown
+                        id={`todo-category-${item.id}`}
+                        name="category"
+                        label="Edit to-do category"
+                        options={CATEGORY_OPTIONS}
+                        value={editCategory}
+                        onChange={setEditCategory}
+                    />
+                }
+                {isEditing &&
+                    <input
+                        aria-label="Edit to-do due date"
+                        className="w-full py-2 px-4 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                        type="date"
+                        value={editDueDate}
+                        onChange={(event) => setEditDueDate(event.target.value)}
+                    />
+                }
                 {isEditing ? (
                     <input
                         aria-label="Edit to-do title"
@@ -224,21 +262,15 @@ function Task({ item, onRequestDelete, onSaveItem }){
                 ) : (
                     <h2 className="font-medium text-lg">{item.title}</h2>
                 )}
-                {isEditing &&
-                    <input
-                        aria-label="Edit to-do due date"
-                        className="w-full py-2 px-4 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
-                        type="date"
-                        value={editDueDate}
-                        onChange={(event) => setEditDueDate(event.target.value)}
-                    />
-                }
+                
+                
                 <ul className={`flex flex-col ${isEditing ? 'gap-2' : 'gap-0'}`}>
                 {/*display tasks by mapping values in tasks array*/}
                 {(isEditing ? editTasks : item.tasks).map((task, index) => (
                         <li
-                        className={`flex items-center font-normal ${isEditing ? 'bg-white' : ''} rounded-md ${isEditing ? 'py-2': 'py-1'} px-4 `}
-                        key={task.id || index}>
+                            className={`flex items-start font-normal ${isEditing ? 'bg-white' : ''} rounded-md ${isEditing ? 'py-2': 'py-1'} px-4 `}
+                            key={task.id || index}
+                        >
                             <button
                                 type="button"
                                 className="mr-2 p-0 border-0 bg-transparent -text--secondary shrink-0 cursor-pointer"

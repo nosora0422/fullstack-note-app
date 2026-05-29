@@ -4,13 +4,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
 import Pill from "../../Pill/Pill";
+import Dropdown from "../../Dropdown/Dropdown";
+
+const SORT_OPTIONS = [
+    { value: "Creation Date", label: "Creation Date" },
+    { value: "Title", label: "Title" },
+];
+
+const CATEGORY_OPTIONS = [
+    { value: "Personal", label: "Personal" },
+    { value: "School", label: "School" },
+    { value: "Work", label: "Work" },
+];
 
 export default function ImageItems({ entries, delRef, updateRef }){
     const [currFilter, setCurrFilter] = useState('All');
     const filterList = ['All', 'School', 'Work', 'Personal'];
 
     const [currSort, setCurrSort] = useState('Creation Date');
-    const sortList = ['Creation Date', 'Title'];
     const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
     const fEntries = sortAndFilterList(entries, currFilter, currSort);
@@ -35,12 +46,15 @@ export default function ImageItems({ entries, delRef, updateRef }){
                         label="Filter images by category"
                     />
                 </div>
-                <div className="mb-2">
-                    <ButtonGroup
-                        validList={sortList}
-                        currentState={currSort}
-                        callBackState={setCurrSort}
+                <div className="mb-2 w-full sm:w-48">
+                    <Dropdown
+                        id="image-sort"
+                        name="image-sort"
                         label="Sort images"
+                        options={SORT_OPTIONS}
+                        value={currSort}
+                        onChange={setCurrSort}
+                        type="secondary"
                     />
                 </div>
             </div>
@@ -61,11 +75,13 @@ export default function ImageItems({ entries, delRef, updateRef }){
 function DrawImage({ item, onRequestDelete, onSaveItem }){
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(item.title);
+    const [editCategory, setEditCategory] = useState(item.category || 'Personal');
     const [editPath, setEditPath] = useState(item.path);
     const [editNote, setEditNote] = useState(item.note);
 
     const startEditing = () => {
         setEditTitle(item.title);
+        setEditCategory(item.category || 'Personal');
         setEditPath(item.path);
         setEditNote(item.note);
         setIsEditing(true);
@@ -73,6 +89,7 @@ function DrawImage({ item, onRequestDelete, onSaveItem }){
 
     const cancelEditing = () => {
         setEditTitle(item.title);
+        setEditCategory(item.category || 'Personal');
         setEditPath(item.path);
         setEditNote(item.note);
         setIsEditing(false);
@@ -88,6 +105,7 @@ function DrawImage({ item, onRequestDelete, onSaveItem }){
         onSaveItem({
             ...item,
             title: trimmedTitle,
+            category: editCategory,
             path: editPath,
             note: editNote,
         });
@@ -144,6 +162,14 @@ function DrawImage({ item, onRequestDelete, onSaveItem }){
                             value={editTitle}
                             onChange={(event) => setEditTitle(event.target.value)}
                             placeholder="Enter Title"
+                        />
+                        <Dropdown
+                            id={`image-category-${item.id}`}
+                            name="category"
+                            label="Edit image category"
+                            options={CATEGORY_OPTIONS}
+                            value={editCategory}
+                            onChange={setEditCategory}
                         />
                         <input
                             aria-label="Edit image note"

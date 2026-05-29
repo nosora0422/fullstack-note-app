@@ -835,10 +835,6 @@ a{
   margin-bottom: 1rem;
 }
 
-.mb-10{
-  margin-bottom: 2.5rem;
-}
-
 .mb-2{
   margin-bottom: 0.5rem;
 }
@@ -1045,8 +1041,16 @@ a{
   flex-wrap: wrap;
 }
 
+.items-start{
+  align-items: flex-start;
+}
+
 .items-center{
   align-items: center;
+}
+
+.justify-start{
+  justify-content: flex-start;
 }
 
 .justify-end{
@@ -1059,6 +1063,10 @@ a{
 
 .justify-between{
   justify-content: space-between;
+}
+
+.gap-0{
+  gap: 0px;
 }
 
 .gap-1{
@@ -1075,10 +1083,6 @@ a{
 
 .gap-5{
   gap: 1.25rem;
-}
-
-.gap-0{
-  gap: 0px;
 }
 
 .space-y-2 > :not([hidden]) ~ :not([hidden]){
@@ -1306,11 +1310,6 @@ a{
   padding-bottom: 1rem;
 }
 
-.py-0{
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
 .pl-6{
   padding-left: 1.5rem;
 }
@@ -1500,6 +1499,12 @@ a{
 .focus-visible\:outline-none:focus-visible{
   outline: 2px solid transparent;
   outline-offset: 2px;
+}
+
+@media (min-width: 640px){
+  .sm\:w-48{
+    width: 12rem;
+  }
 }
 
 @media (min-width: 768px){

@@ -14,7 +14,7 @@ export default function Header(){
     const navigate = useNavigate();
     const cRoute = useLocation();
     const isGuest = cRoute.pathname.startsWith('/guest') || getAppMode() === "guest";
-    const displayName = isGuest ? "Guest" : user?.displayName || "Guest";
+    const displayName = getFirstName(user, isGuest);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -124,4 +124,18 @@ export default function Header(){
         </header>
         </>
     )
+}
+
+function getFirstName(user, isGuest) {
+    if (isGuest) {
+        return "Guest";
+    }
+
+    const displayName = user?.displayName?.trim();
+
+    if (displayName) {
+        return displayName.split(/\s+/)[0];
+    }
+
+    return user?.email?.split('@')[0] || "Guest";
 }

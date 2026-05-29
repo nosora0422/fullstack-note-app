@@ -14,7 +14,8 @@ export default function Signup(){
     const [registerEmail, setRegisterEmail] = useState("");
     const [password, setPassword] = useState("");
     const [registerPassword, setRegisterPassword] = useState("");
-    const [registerName, setRegisterName] = useState("");
+    const [registerFirstName, setRegisterFirstName] = useState("");
+    const [registerLastName, setRegisterLastName] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState({});
@@ -22,7 +23,8 @@ export default function Signup(){
 
     const register = async () => {
         const validationErrors = SignupValidation({
-            name: registerName,
+            firstName: registerFirstName,
+            lastName: registerLastName,
             email: registerEmail,
             password,
         });
@@ -41,7 +43,7 @@ export default function Signup(){
             const userCredential = await createUserWithEmailAndPassword(auth, registerEmail, registerPassword);
             const user = userCredential.user;
             // Update user profile with the name
-            await updateProfile(user, { displayName: registerName });
+            await updateProfile(user, { displayName: `${registerFirstName} ${registerLastName}` });
             setAppMode("user");
             navigate('/app/todos');
             
@@ -62,21 +64,39 @@ export default function Signup(){
                 <div>
                     <div>
                         <div className="pt-4 flex flex-col">
-                            <label htmlFor='name'>Name</label>
+                            <label htmlFor='firstName'>First Name</label>
                             <input
-                                id="name"
+                                id="firstName"
                                 className="border border-solid -border--outline rounded py-2 px-3" 
-                                name="name"
+                                name="firstName"
                                 type="text"
-                                autoComplete="name"
-                                aria-invalid={Boolean(error.name)}
-                                aria-describedby={error.name ? 'signup-name-error' : undefined}
+                                autoComplete="given-name"
+                                aria-invalid={Boolean(error.firstName)}
+                                aria-describedby={error.firstName ? 'signup-firstName-error' : undefined}
                                 onChange={(event) => {
-                                    setRegisterName(event.target.value)
+                                    setRegisterFirstName(event.target.value)
                                 }} 
-                                placeholder="Your Name" 
+                                placeholder="Your First Name" 
                             />
-                            {error.name && <p id="signup-name-error" className='text-xs text-red-700'>{error.name}</p>}
+                            {error.firstName && <p id="signup-firstName-error" className='text-xs text-red-700'>{error.firstName}</p>}
+                            
+                        </div>
+                        <div className="pt-4 flex flex-col">
+                        <label htmlFor='lastName'>Last Name</label>
+                            <input
+                                    id="lastName"
+                                    className="border border-solid -border--outline rounded py-2 px-3" 
+                                    name="lastName"
+                                    type="text"
+                                    autoComplete="family-name"
+                                    aria-invalid={Boolean(error.lastName)}
+                                    aria-describedby={error.lastName ? 'signup-lastName-error' : undefined}
+                                    onChange={(event) => {
+                                        setRegisterLastName(event.target.value)
+                                    }} 
+                                    placeholder="Your Last Name" 
+                                />
+                                {error.lastName && <p id="signup-lastName-error" className='text-xs text-red-700'>{error.lastName}</p>}
                         </div>
                         <div className='pt-4 flex flex-col'>
                             <label htmlFor='email'>Email</label>

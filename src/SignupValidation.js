@@ -3,10 +3,15 @@ export default function SignupValidation(values){
     const email_pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const password_pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{8,}$/;
 
-    if(values.name === ''){
-        error.name = "Please enter your name"
+    if(values.firstName === ''){
+        error.firstName = "Please enter your first name"
     }else{
-        error.name = ""
+        error.firstName = ""
+    }
+    if(values.lastName === ''){
+        error.lastName = "Please enter your last name"
+    }else{
+        error.lastName = ""
     }
 
     if(values.email === ''){
