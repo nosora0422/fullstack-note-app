@@ -59,5 +59,8 @@
     .button-tertiary {
         @apply  -text--on-primary-container hover:-bg--primary-container-hover;
     }
+    .button-icon{
+        @apply py-1 px-2 rounded-md bg-transparent -text--icon-grey cursor-pointer hover:-text--icon-grey-hover;
+    }
 
 }

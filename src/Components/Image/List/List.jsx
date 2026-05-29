@@ -3,6 +3,13 @@ import { v4 as uuidv4 } from "uuid";
 import ImageItems from "../Items/Items";
 import { getLegacyStorageKey, migrateLegacyData, readStorageItems, useScopedStorageKey } from "../../../utils/storage";
 import { addUserItem, deleteUserItem, getUserItems, updateUserItem } from "../../../services/firestoreService";
+import Dropdown from "../../Dropdown/Dropdown";
+
+const CATEGORY_OPTIONS = [
+  { value: "Personal", label: "Personal" },
+  { value: "School", label: "School" },
+  { value: "Work", label: "Work" },
+];
 
 export default function ImageList({ searchTerm }) {
   const [textVal, setTextVal] = useState('');
@@ -127,20 +134,14 @@ export default function ImageList({ searchTerm }) {
           <h1 className="text-3xl my-4">Image</h1>
           <div className="h-min p-4 rounded-md -bg--surface-container">
             <div className="flex flex-col gap-2">
-              <select
+              <Dropdown
                 id="image-category"
                 name="category"
-                aria-label="Image category"
-                className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none"
+                label="Image category"
+                options={CATEGORY_OPTIONS}
                 value={categoryVal}
-                onChange={(event) => {
-                  setCategoryVal(event.target.value);
-                }}
-              >
-                <option value="Personal">Personal</option>
-                <option value="School">School</option>
-                <option value="Work">Work</option>
-              </select>
+                onChange={setCategoryVal}
+              />
               <div className="flex items-center bg-white rounded-sm">
                 <input
                   id="image-title"
@@ -151,6 +152,18 @@ export default function ImageList({ searchTerm }) {
                     setTitleVal(event.target.value);
                   }}
                   placeholder="Enter Title"
+                />
+              </div>
+              <div className="flex items-center bg-white rounded-sm">
+                <input
+                  id="image-note"
+                  aria-label="Image note"
+                  className="w-full mx-2 py-2 px-2 border-none focus:ring-0 focus:outline-none focus-visible:outline-none"
+                  value={textVal}
+                  onChange={(event) => {
+                    setTextVal(event.target.value);
+                  }}
+                  placeholder="Enter Note"
                 />
               </div>
               <div className="flex flex-col justify-center min-h-24 items-center bg-white rounded-sm">
@@ -178,18 +191,7 @@ export default function ImageList({ searchTerm }) {
                   placeholder="Enter Image Path"
                 />
               </div>
-              <div className="flex items-center bg-white rounded-sm">
-                <input
-                  id="image-note"
-                  aria-label="Image note"
-                  className="w-full mx-2 py-2 px-2 border-none focus:ring-0 focus:outline-none focus-visible:outline-none"
-                  value={textVal}
-                  onChange={(event) => {
-                    setTextVal(event.target.value);
-                  }}
-                  placeholder="Enter Note"
-                />
-              </div>
+              
                 <button
                   className={`button button-primary ${isCreateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                   type="button"

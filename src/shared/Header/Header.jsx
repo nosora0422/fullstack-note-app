@@ -57,7 +57,6 @@ export default function Header(){
                     aria-label={isNavOpen ? "Close navigation menu" : "Open navigation menu"}
                 >
                     <FontAwesomeIcon icon={isNavOpen ? faXmark : faBars} aria-hidden="true" />
-                    <span className="font-medium">Note App</span>
                 </button>
                     <ul id="mobile-navigation" className={isNavOpen ? "mobile-nav-items-open" : "mobile-nav-items"}>
                         <li>
@@ -99,8 +98,7 @@ export default function Header(){
                     <span aria-hidden="true">👋 </span>
                     Hi, {displayName}!
                 </p>
-                <p className="text-3xl mb-10">Note App</p>
-                <ul className="flex flex-col flex-grow h-40">
+                <ul className="flex flex-col flex-grow h-40 mt-4">
                     <li>
                         <Link to={todosPath} className={(cRoute.pathname === '/app' || cRoute.pathname.endsWith('/todos')) ? 'nav-item-curr' : 'nav-item'}><FontAwesomeIcon icon={faListCheck} className="mr-2"/>To Do List
                         </Link>

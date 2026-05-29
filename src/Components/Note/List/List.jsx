@@ -3,6 +3,13 @@ import { v4 as uuidv4 } from 'uuid';
 import NoteItems from "../Items/Items";
 import { getLegacyStorageKey, migrateLegacyData, readStorageItems, useScopedStorageKey } from "../../../utils/storage";
 import { addUserItem, deleteUserItem, getUserItems, updateUserItem } from "../../../services/firestoreService";
+import Dropdown from "../../Dropdown/Dropdown";
+
+const CATEGORY_OPTIONS = [
+    { value: "Personal", label: "Personal" },
+    { value: "School", label: "School" },
+    { value: "Work", label: "Work" },
+];
 
 export default function List({ searchTerm }){
     const [textVal, setTextVal] = useState('');
@@ -125,20 +132,14 @@ export default function List({ searchTerm }){
                 <h1 className="text-3xl my-4">Note</h1>
                     <div className="th-min p-4 rounded-md -bg--surface-container">
                         <div className="flex flex-col gap-2">
-                            <select
+                            <Dropdown
                                 id="note-category"
                                 name="category"
-                                aria-label="Note category"
-                                className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none"
+                                label="Note category"
+                                options={CATEGORY_OPTIONS}
                                 value={categoryVal}
-                                onChange={event => {
-                                    setCategoryVal(event.target.value)
-                                }}
-                            >
-                                <option value="Personal">Personal</option>
-                                <option value="School">School</option>
-                                <option value="Work">Work</option>
-                            </select>
+                                onChange={setCategoryVal}
+                            />
                             <div className="flex items-center bg-white rounded-sm">
                                 <input
                                     id="note-title"
@@ -151,11 +152,11 @@ export default function List({ searchTerm }){
                                     placeholder="Enter Title">
                                 </input>
                             </div>
-                            <div className="iflex items-center bg-white rounded-sm">
+                            <div className="flex items-center bg-white rounded-sm">
                                 <textarea
                                     id="note-body"
                                     aria-label="Note text"
-                                    className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none font-Roboto h-52"
+                                    className="w-full py-2 px-4 border-none rounded-sm focus:ring-0 focus:outline-none focus-visible:outline-none h-52"
                                     value={textVal}
                                     onChange={(event) => {setTextVal(event.target.value);
                                     }}

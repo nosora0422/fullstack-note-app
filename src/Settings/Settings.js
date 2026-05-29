@@ -12,6 +12,7 @@ import { deleteAllUserItems, deleteUserItems } from "../services/firestoreServic
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import Footer from "../shared/Footer/Footer";
+import ConfirmationModal from "../Components/ConfirmationModal/ConfirmationModal";
 
 const DATA_TYPES = [
   { label: "Notes", type: "notes" },
@@ -22,6 +23,7 @@ const DATA_TYPES = [
 export default function Settings() {
   const [user, setUser] = useState(auth.currentUser);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [pendingClearAction, setPendingClearAction] = useState(null);
   const navigate = useNavigate();
   const appMode = getAppMode();
   const isGuest = appMode === "guest";
@@ -65,6 +67,19 @@ export default function Settings() {
     window.location.reload();
   };
 
+  const confirmClearData = async () => {
+    if (!pendingClearAction) {
+      return;
+    }
+
+    if (pendingClearAction.type === "all") {
+      await clearAllCurrentData();
+      return;
+    }
+
+    await clearDataType(pendingClearAction.type);
+  };
+
   const logout = async () => {
     if (isGuest) {
       clearGuestData();
@@ -93,7 +108,7 @@ export default function Settings() {
                 type="button"
                 className="button button-secondary w-full"
                 key={type}
-                onClick={() => clearDataType(type)}
+                onClick={() => setPendingClearAction({ type, label })}
               >
                 Clear {label}
               </button>
@@ -101,7 +116,7 @@ export default function Settings() {
             <button
               type="button"
               className="button button-primary w-full"
-              onClick={clearAllCurrentData}
+              onClick={() => setPendingClearAction({ type: "all", label: "all saved data" })}
             >
               Clear All Saved Data
             </button>
@@ -116,6 +131,14 @@ export default function Settings() {
           </div>
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={Boolean(pendingClearAction)}
+        title="Clear Data"
+        message={`Are you sure you want to clear ${pendingClearAction?.label || "this data"}? This cannot be undone.`}
+        confirmLabel="Clear"
+        onConfirm={confirmClearData}
+        onCancel={() => setPendingClearAction(null)}
+      />
       <Footer />
     </div>
   );

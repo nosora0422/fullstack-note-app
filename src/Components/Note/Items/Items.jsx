@@ -9,8 +9,8 @@ export default function NoteItems({ entries, delRef, updateRef }){
     const [currFilter, setCurrFilter] = useState('All');
     const filterList = ['All', 'School', 'Work', 'Personal'];
 
-    const [currSort, setCurrSort] = useState('Date');
-    const sortList = ['Date', 'Text'];
+    const [currSort, setCurrSort] = useState('Creation Date');
+    const sortList = ['Creation Date', 'Title'];
     const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
     const fEntries = sortAndFilterList(entries, currFilter, currSort);
@@ -94,14 +94,12 @@ function Note({ item, onRequestDelete, onSaveItem }){
         <li className="masonry-grid-item gap-2 py-4 px-4 rounded-md -bg--surface-container" key={item.id}>
             <div>
                 <div className="flex justify-between items-center">
-                    <p className="text-xs">
-                        {retDateString(item.date)}
-                    </p>
+                    <Pill category={item.category} />
                     <div className="flex items-center gap-1">
                         {!isEditing &&
                             <button
                                 type="button"
-                                className="p-1 border-0 bg-transparent cursor-pointer"
+                                className="button-icon"
                                 onClick={startEditing}
                                 aria-label="Edit note"
                             >
@@ -110,7 +108,7 @@ function Note({ item, onRequestDelete, onSaveItem }){
                         }
                         <button
                             type="button"
-                            className="p-1 border-0 bg-transparent cursor-pointer"
+                            className="button-icon"
                             onClick={() => onRequestDelete(item.id)}
                             aria-label="Delete note"
                         >
@@ -118,9 +116,8 @@ function Note({ item, onRequestDelete, onSaveItem }){
                         </button>
                     </div>
                 </div>
-                <Pill category={item.category} />
             </div>
-            <div>
+            <div className="flex flex-col gap-2">
                 {isEditing ? (
                     <>
                         <input
@@ -132,7 +129,7 @@ function Note({ item, onRequestDelete, onSaveItem }){
                         />
                         <textarea
                             aria-label="Edit note text"
-                            className="w-full min-h-32 py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none font-Roboto"
+                            className="w-full min-h-32 py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                             value={editNote}
                             onChange={(event) => setEditNote(event.target.value)}
                             placeholder="Enter Note"
@@ -176,7 +173,7 @@ function sortAndFilterList(entries, currFilter, currSort) {
             return cItem.category?.toLowerCase() === currFilter.toLowerCase() || currFilter === 'All';
         })
         .sort((a, b) => {
-            if (currSort === "Text") {
+            if (currSort === "Title") {
                 if (a.title > b.title)
                     return 1;
                 else if (a.title === b.title)
@@ -197,9 +194,3 @@ function sortAndFilterList(entries, currFilter, currSort) {
 
 }
 
-function retDateString(timestamp) {
-
-    const cDate = new Date(timestamp);
-    return cDate.toDateString() + ' at ' + cDate.getHours() + ':' + cDate.getMinutes() + ':' + cDate.getSeconds();
-
-}

@@ -16,6 +16,8 @@ module.exports = {
         '--secondary-container':' #C0D0B4',
         '--on-primary-container': '#052100',
         '--secondary': '#55624C',
+        '--icon-grey': '#757575',
+        '--icon-grey-hover': '#616161',
         '--outline': '#73796E',
         '--outline-variation': '#C3C8BB',
         '--tertiary': '#386667',
@@ -40,4 +42,3 @@ module.exports = {
   },
   plugins: [],
 }
-

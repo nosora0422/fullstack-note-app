@@ -7,12 +7,20 @@ import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getLegacyStorageKey, migrateLegacyData, readStorageItems, useScopedStorageKey } from "../../../utils/storage";
 import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
 import { addUserItem, deleteUserItem, getUserItems, updateUserItem } from "../../../services/firestoreService";
+import Dropdown from "../../Dropdown/Dropdown";
+
+const CATEGORY_OPTIONS = [
+    { value: "Personal", label: "Personal" },
+    { value: "School", label: "School" },
+    { value: "Work", label: "Work" },
+];
 
 export default function List({ searchTerm }){
     const [taskValues, setTaskValues] = useState(['']);
     const [items, setItems] = useState([]);
     const [titleVal, setTitleVal] = useState('');
-    const [categoryVal, setCategoryVal] = useState('personal');
+    const [categoryVal, setCategoryVal] = useState('Personal');
+    const [dueDateVal, setDueDateVal] = useState('');
     const { key: storageKey, isReady, mode, user } = useScopedStorageKey("todos");
     const [loadedStorageKey, setLoadedStorageKey] = useState(null);
     const [pendingTaskDeleteIndex, setPendingTaskDeleteIndex] = useState(null);
@@ -97,6 +105,7 @@ export default function List({ searchTerm }){
             const tasksArray = taskValues.map((taskText) => ({
                 id: uuidv4(),
                 task: taskText,
+                completed: false,
             }));
 
             const newItem = {
@@ -104,6 +113,7 @@ export default function List({ searchTerm }){
                 title: titleVal,
                 tasks: tasksArray,
                 category: categoryVal,
+                dueDate: dueDateVal,
                 date: Date.now()
             };
 
@@ -120,6 +130,7 @@ export default function List({ searchTerm }){
 
             // reset input valuse after adding to the local storage
             setTitleVal('');
+            setDueDateVal('');
             setTaskValues(['']);
         }
     }
@@ -162,20 +173,14 @@ export default function List({ searchTerm }){
                 <h1 className="text-3xl my-4">To do list</h1>
                     <div className="h-min p-4 rounded-md -bg--surface-container">
                         <div className="flex flex-col gap-2">
-                            <select
+                            <Dropdown
                                 id="todo-category"
                                 name="category"
-                                aria-label="To-do category"
-                                className="w-full py-2 px-4 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                                label="To-do category"
+                                options={CATEGORY_OPTIONS}
                                 value={categoryVal}
-                                onChange={event => {
-                                    setCategoryVal(event.target.value)
-                                }}
-                            >
-                                <option value="Personal">Personal</option>
-                                <option value="School">School</option>
-                                <option value="Work">Work</option>
-                            </select>
+                                onChange={setCategoryVal}
+                            />
                             <div className="flex items-center bg-white rounded-sm">
                                 <input
                                     id="todo-title"
@@ -187,6 +192,18 @@ export default function List({ searchTerm }){
                                     }}
                                     placeholder="Enter Title">
                                 </input>
+                            </div>
+                            <div className="flex items-center bg-white rounded-sm">
+                                <input
+                                    id="todo-due-date"
+                                    aria-label="To-do due date"
+                                    className="w-full mx-2 py-2 px-2 border-0 focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                                    type="date"
+                                    value={dueDateVal}
+                                    onChange={(event) => {
+                                        setDueDateVal(event.target.value);
+                                    }}
+                                />
                             </div>
                             {taskValues.map((task, index) => (
                                 <div className="flex items-center bg-white rounded-sm" key={index}>
@@ -201,7 +218,7 @@ export default function List({ searchTerm }){
                                     {index > 0 && (
                                         <button
                                             type="button"
-                                            className="p-2 border-0 bg-transparent cursor-pointer"
+                                            className="button-icon"
                                             onClick={() => setPendingTaskDeleteIndex(index)}
                                             aria-label={`Remove task ${index + 1}`}
                                         ><FontAwesomeIcon icon={faTrashCan} />

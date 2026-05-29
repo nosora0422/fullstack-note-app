@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import ButtonGroup from "../../ButtonGroup/ButtonGroup";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,8 +12,8 @@ export default function ToDoItems({ entries, delRef, updateRef }){
     const [currFilter, setCurrFilter] = useState('All');
     const filterList = ['All', 'School', 'Work', 'Personal'];
 
-    const [currSort, setCurrSort] = useState('Date');
-    const sortList = ['Date', 'Text'];
+    const [currSort, setCurrSort] = useState('Due Date');
+    const sortList = ['Due Date', 'Creation Date', 'Title'];
     const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
     const fEntries = sortAndFilterList(entries, currFilter, currSort);
@@ -69,10 +69,13 @@ export default function ToDoItems({ entries, delRef, updateRef }){
 
 function Task({ item, onRequestDelete, onSaveItem }){
     //set each item isChecked to false (unchecked)
-    const [isChecked, setIsChecked] = useState(item.tasks.map(() => false));;
+    const [isChecked, setIsChecked] = useState(getCheckedTasks(item.tasks));
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(item.title);
+    const [editDueDate, setEditDueDate] = useState(item.dueDate || '');
     const [editTasks, setEditTasks] = useState(createTaskDrafts(item.tasks));
+    const [pendingEditTaskDeleteId, setPendingEditTaskDeleteId] = useState(null);
+    const status = getDueDateStatus(item.dueDate, isChecked);
 
     //update isChecked to opposite = first click will change to checked box
     //get index and run setIsChecked only for the item that has the index
@@ -80,18 +83,36 @@ function Task({ item, onRequestDelete, onSaveItem }){
         const updatedIsChecked = [...isChecked];
         updatedIsChecked[index] = !updatedIsChecked[index];
         setIsChecked(updatedIsChecked);
-        // console.log(index);
+
+        if (isEditing) {
+            setEditTasks((currentTasks) => currentTasks.map((task, taskIndex) => ({
+                ...task,
+                completed: Boolean(updatedIsChecked[taskIndex]),
+            })));
+            return;
+        }
+
+        onSaveItem({
+            ...item,
+            tasks: item.tasks.map((task, taskIndex) => ({
+                ...task,
+                completed: updatedIsChecked[taskIndex],
+            })),
+        });
     };
 
     const startEditing = () => {
         setEditTitle(item.title);
+        setEditDueDate(item.dueDate || '');
         setEditTasks(createTaskDrafts(item.tasks));
         setIsEditing(true);
     };
 
     const cancelEditing = () => {
         setEditTitle(item.title);
+        setEditDueDate(item.dueDate || '');
         setEditTasks(createTaskDrafts(item.tasks));
+        setPendingEditTaskDeleteId(null);
         setIsEditing(false);
     };
 
@@ -110,12 +131,22 @@ function Task({ item, onRequestDelete, onSaveItem }){
             {
                 id: uuidv4(),
                 task: '',
+                completed: false,
             },
         ]);
     };
 
     const deleteEditTask = (taskId) => {
         setEditTasks(editTasks.filter((task) => task.id !== taskId));
+        setPendingEditTaskDeleteId(null);
+    };
+
+    const confirmDeleteEditTask = () => {
+        if (!pendingEditTaskDeleteId) {
+            return;
+        }
+
+        deleteEditTask(pendingEditTaskDeleteId);
     };
 
     const saveEditing = () => {
@@ -128,35 +159,51 @@ function Task({ item, onRequestDelete, onSaveItem }){
         onSaveItem({
             ...item,
             title: trimmedTitle,
+            dueDate: editDueDate,
             tasks: editTasks.map((task) => ({
                 id: task.id,
                 task: task.task,
+                completed: Boolean(task.completed),
             })),
         });
         setIsEditing(false);
     };
 
+    useEffect(() => {
+        setIsChecked(getCheckedTasks(item.tasks));
+    }, [item.tasks]);
+
     return(
         <li className="masonry-grid-item gap-2 py-4 px-4 rounded-md -bg--surface-container" key={item.id}>
-            <div>
+            <div className="flex flex-col gap-1">
                 <div className="flex justify-between items-center">
-                    <p className="text-xs">
-                        {retDateString(item.date)}
-                    </p>
+                    <div className="flex flex-row items-center gap-3">
+                        <Pill category={item.category} />
+                        <div className="flex items-center gap-1">
+                            <span
+                                className={`rounded-full w-2 h-2 ${status.colorClass} inline-block`}
+                                title={status.label}
+                                aria-label={status.label}
+                            ></span>
+                            <p className="text-xs font-medium">
+                                {item.dueDate ? `Due ${retDueDateString(item.dueDate)}` : 'No due date'}
+                            </p>
+                        </div>
+                    </div>
                     <div className="flex items-center gap-1">
                         {!isEditing &&
                             <button
                                 type="button"
-                                className="p-1 border-0 bg-transparent cursor-pointer"
+                                className="button-icon"
                                 onClick={startEditing}
                                 aria-label="Edit to-do item"
                             >
-                                <FontAwesomeIcon icon={faPenToSquare} />
+                                <FontAwesomeIcon icon={faPenToSquare}/>
                             </button>
                         }
                         <button
                             type="button"
-                            className="p-1 border-0 bg-transparent cursor-pointer"
+                            className="button-icon"
                             onClick={() => onRequestDelete(item.id)}
                             aria-label="Delete to-do item"
                         >
@@ -164,13 +211,12 @@ function Task({ item, onRequestDelete, onSaveItem }){
                         </button>
                     </div>
                 </div>
-                <Pill category={item.category} />
             </div>
-            <div>
+            <div className="flex flex-col gap-2">
                 {isEditing ? (
                     <input
                         aria-label="Edit to-do title"
-                        className="w-full mb-2 py-2 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                        className="w-full py-2 px-4 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                         value={editTitle}
                         onChange={(event) => setEditTitle(event.target.value)}
                         placeholder="Enter Title"
@@ -178,11 +224,20 @@ function Task({ item, onRequestDelete, onSaveItem }){
                 ) : (
                     <h2 className="font-medium text-lg">{item.title}</h2>
                 )}
-                <ul>
+                {isEditing &&
+                    <input
+                        aria-label="Edit to-do due date"
+                        className="w-full py-2 px-4 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                        type="date"
+                        value={editDueDate}
+                        onChange={(event) => setEditDueDate(event.target.value)}
+                    />
+                }
+                <ul className={`flex flex-col ${isEditing ? 'gap-2' : 'gap-0'}`}>
                 {/*display tasks by mapping values in tasks array*/}
                 {(isEditing ? editTasks : item.tasks).map((task, index) => (
                         <li
-                        className="flex items-center py-1 font-normal"
+                        className={`flex items-center font-normal ${isEditing ? 'bg-white' : ''} rounded-md ${isEditing ? 'py-2': 'py-1'} px-4 `}
                         key={task.id || index}>
                             <button
                                 type="button"
@@ -194,18 +249,18 @@ function Task({ item, onRequestDelete, onSaveItem }){
                                 <FontAwesomeIcon icon={isChecked[index] ? checked : unchecked} aria-hidden="true" />
                             </button>
                             {isEditing ? (
-                                <div className="w-full flex items-center bg-white rounded-sm">
+                                <div className="w-full flex items-center rounded-sm">
                                     <input
                                         aria-label={`Edit task ${index + 1}`}
-                                        className="w-full py-1 px-2 border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
+                                        className="w-full border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
                                         value={task.task}
                                         onChange={(event) => handleTaskChange(index, event.target.value)}
                                         placeholder="Enter Task"
                                     />
                                     <button
                                         type="button"
-                                        className="p-2 border-0 bg-transparent cursor-pointer"
-                                        onClick={() => deleteEditTask(task.id)}
+                                        className="button-icon"
+                                        onClick={() => setPendingEditTaskDeleteId(task.id)}
                                         aria-label={`Delete task ${index + 1}`}
                                     >
                                         <FontAwesomeIcon icon={faTrashCan} />
@@ -221,7 +276,7 @@ function Task({ item, onRequestDelete, onSaveItem }){
                     <div className="flex flex-col gap-2">
                         <button
                             type="button"
-                            className="button button-tertiary rounded-sm mt-3 w-full"
+                            className="button button-tertiary rounded-sm mt-2 w-full"
                             onClick={addEditTask}
                         >
                             <FontAwesomeIcon icon={faPlus} /> Add Task
@@ -246,8 +301,14 @@ function Task({ item, onRequestDelete, onSaveItem }){
                         </div>
                     </div>
                 }
-
             </div>
+            <ConfirmationModal
+                isOpen={Boolean(pendingEditTaskDeleteId)}
+                title="Delete Task"
+                message="Delete this task from the to-do item?"
+                onConfirm={confirmDeleteEditTask}
+                onCancel={() => setPendingEditTaskDeleteId(null)}
+            />
         </li>
     )
 }
@@ -261,7 +322,7 @@ function sortAndFilterList(entries, currFilter, currSort) {
             return cItem.category?.toLowerCase() === currFilter.toLowerCase() || currFilter === 'All';
         })
         .sort((a, b) => {
-            if (currSort === "Text") {
+            if (currSort === "Title") {
                 if (a.title > b.title)
                     return 1;
                 else if (a.title === b.title)
@@ -269,7 +330,9 @@ function sortAndFilterList(entries, currFilter, currSort) {
                 else
                     return -1;
             }
-            else {
+            else if (currSort === "Due Date") {
+                return compareDueDates(a, b);
+            } else {
                 if (a.date > b.date)
                     return 1;
                 else if (a.date === b.date)
@@ -282,16 +345,118 @@ function sortAndFilterList(entries, currFilter, currSort) {
 
 }
 
+function compareDueDates(a, b) {
+    const aDueDate = getDueDateEndTime(a.dueDate);
+    const bDueDate = getDueDateEndTime(b.dueDate);
+
+    if (!aDueDate && !bDueDate) {
+        return a.date - b.date;
+    }
+
+    if (!aDueDate) {
+        return 1;
+    }
+
+    if (!bDueDate) {
+        return -1;
+    }
+
+    const now = Date.now();
+    const aIsOverdue = aDueDate.getTime() < now;
+    const bIsOverdue = bDueDate.getTime() < now;
+
+    if (aIsOverdue && bIsOverdue) {
+        return bDueDate.getTime() - aDueDate.getTime();
+    }
+
+    if (aIsOverdue) {
+        return -1;
+    }
+
+    if (bIsOverdue) {
+        return 1;
+    }
+
+    return aDueDate.getTime() - bDueDate.getTime();
+}
+
 function createTaskDrafts(tasks) {
     return tasks.map((task) => ({
         id: task.id || uuidv4(),
         task: task.task,
+        completed: Boolean(task.completed),
     }));
 }
 
-function retDateString(timestamp) {
-
-    const cDate = new Date(timestamp);
-    return cDate.toDateString() + ' at ' + cDate.getHours() + ':' + cDate.getMinutes() + ':' + cDate.getSeconds();
-
+function getCheckedTasks(tasks) {
+    return tasks.map((task) => Boolean(task.completed));
 }
+
+function getDueDateStatus(dueDate, checkedTasks) {
+    if (checkedTasks.length > 0 && checkedTasks.every(Boolean)) {
+        return {
+            colorClass: 'bg-green-500',
+            label: 'Completed',
+        };
+    }
+
+    const dueAt = getDueDateEndTime(dueDate);
+
+    if (!dueAt) {
+        return {
+            colorClass: 'bg-gray-400',
+            label: 'No due date',
+        };
+    }
+
+    const timeRemaining = dueAt.getTime() - Date.now();
+
+    if (timeRemaining < 0) {
+        return {
+            colorClass: 'bg-red-500',
+            label: 'Past due',
+        };
+    }
+
+    if (timeRemaining < 24 * 60 * 60 * 1000) {
+        return {
+            colorClass: 'bg-yellow-400',
+            label: 'Less than 1 day left',
+        };
+    }
+
+    return {
+        colorClass: 'bg-gray-400',
+        label: 'Due later',
+    };
+}
+
+function getDueDateEndTime(dueDate) {
+    if (!dueDate) {
+        return null;
+    }
+
+    const [year, month, day] = dueDate.split('-').map(Number);
+
+    if (!year || !month || !day) {
+        return null;
+    }
+
+    return new Date(year, month - 1, day, 23, 59, 59, 999);
+}
+
+function retDueDateString(dueDate) {
+    const dueAt = getDueDateEndTime(dueDate);
+
+    if (!dueAt) {
+        return 'No due date';
+    }
+
+    return dueAt.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+}
+
+
