@@ -2,38 +2,65 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import NoteItems from "../Items/Items";
 import { getLegacyStorageKey, migrateLegacyData, readStorageItems, useScopedStorageKey } from "../../../utils/storage";
+import { addUserItem, deleteUserItem, getUserItems, updateUserItem } from "../../../services/firestoreService";
 
 export default function List({ searchTerm }){
     const [textVal, setTextVal] = useState('');
     const [items, setItems] = useState([]);
     const [titleVal, setTitleVal] = useState('');
     const [categoryVal, setCategoryVal] = useState('Personal');
-    const { key: storageKey, isReady } = useScopedStorageKey("notes");
+    const { key: storageKey, isReady, mode, user } = useScopedStorageKey("notes");
     const [loadedStorageKey, setLoadedStorageKey] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState("");
     const isCreateDisabled = titleVal.trim() === '' && textVal.trim() === '';
 
-    //get data from localstorage
-    useEffect(()=>{
-        if (!isReady || !storageKey) {
+    //get data from FireStore or localstorage
+    useEffect(() => {
+        if (!isReady) {
             return;
         }
 
-        migrateLegacyData(getLegacyStorageKey("notes"), storageKey);
-        setItems(readStorageItems(storageKey));
-        setLoadedStorageKey(storageKey);
-    },[isReady, storageKey]);
+        const loadItems = async () => {
+            setIsLoading(true);
+            setLoadError("");
+
+            try {
+                if (mode === "guest") {
+                    migrateLegacyData(getLegacyStorageKey("notes"), storageKey);
+                    setItems(readStorageItems(storageKey));
+                    setLoadedStorageKey(storageKey);
+                    return;
+                }
+
+                if (mode === "user" && user) {
+                    const firestoreItems = await getUserItems(user.uid, "notes");
+                    setItems(firestoreItems);
+                    setLoadedStorageKey(storageKey);
+                }
+            } catch (error) {
+                console.error("Failed to load notes:", error);
+                setLoadError("Could not load notes. Please try refreshing the page.");
+                setItems([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadItems();
+    }, [isReady, storageKey, mode, user]);
 
     //save data to localstorage whenver items updated
     useEffect(() => {
-        if (!isReady || !storageKey || loadedStorageKey !== storageKey) {
+        if (mode !== "guest" || !isReady || !storageKey || loadedStorageKey !== storageKey) {
             return;
         }
 
         localStorage.setItem(storageKey, JSON.stringify(items));
-    }, [items, isReady, storageKey, loadedStorageKey]);
+    }, [items, isReady, storageKey, loadedStorageKey, mode]);
 
 
-    const addItem = () => {
+    const addItem = async () => {
         if (titleVal !== ""){
             const newItem = {
                 id: uuidv4(),
@@ -43,6 +70,15 @@ export default function List({ searchTerm }){
                 date: Date.now()
             };
 
+            if (mode === "user" && user) {
+                try {
+                    await addUserItem(user.uid, "notes", newItem);
+                } catch (error) {
+                    console.error("Failed to add note:", error);
+                    return;
+                }
+            }
+
             setItems([...items, newItem]);
 
             // reset input valuse after adding to the local storage
@@ -51,13 +87,31 @@ export default function List({ searchTerm }){
         }
     }
 
-    const deleteItem = (key) =>{
+    const deleteItem = async (key) =>{
+        if (mode === "user" && user) {
+            try {
+                await deleteUserItem(user.uid, "notes", key);
+            } catch (error) {
+                console.error("Failed to delete note:", error);
+                return;
+            }
+        }
+
         setItems((currentItems) => currentItems.filter((item) => {
             return item.id !== key;
         }));
     }
 
-    const updateItem = (updatedItem) => {
+    const updateItem = async (updatedItem) => {
+        if (mode === "user" && user) {
+            try {
+                await updateUserItem(user.uid, "notes", updatedItem);
+            } catch (error) {
+                console.error("Failed to update note:", error);
+                return;
+            }
+        }
+
         setItems((currentItems) => currentItems.map((item) => {
             return item.id === updatedItem.id ? updatedItem : item;
         }));
@@ -121,18 +175,24 @@ export default function List({ searchTerm }){
                     </div>
                 </div>
                 <div className="col-span-12 lg:col-span-8">
-                    <NoteItems
-                         entries={items.filter((item) => {
-                            const searchResult = searchTerm.toLowerCase();
-                            // Check if searchText is in title or any note text
-                            return (
-                                (item.title && item.title.toLowerCase().includes(searchResult)) ||
-                                (item.note && item.note.toLowerCase().includes(searchResult))
-                            );
-                        })}
-                        delRef={deleteItem}
-                        updateRef={updateItem}
-                    />
+                    {isLoading ? (
+                        <p className="w-full py-4 px-6 rounded-md -bg--surface-bright">Loading notes...</p>
+                    ) : loadError ? (
+                        <p className="w-full py-4 px-6 rounded-md -bg--surface-bright">{loadError}</p>
+                    ) : (
+                        <NoteItems
+                             entries={items.filter((item) => {
+                                const searchResult = searchTerm.toLowerCase();
+                                // Check if searchText is in title or any note text
+                                return (
+                                    (item.title && item.title.toLowerCase().includes(searchResult)) ||
+                                    (item.note && item.note.toLowerCase().includes(searchResult))
+                                );
+                            })}
+                            delRef={deleteItem}
+                            updateRef={updateItem}
+                        />
+                    )}
                 </div>
             </div>
         </div>

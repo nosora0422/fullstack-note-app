@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter, Navigate, Routes, Route } from "react-router-dom"; 
-import './index.css';
 import './reset.css';
 import App from './App';
 import Note from './Views/Note/Note';
@@ -12,6 +11,7 @@ import Signup from './Signup/Signup';
 import Settings from './Settings/Settings';
 import ProtectedRoute from './routes/ProtectedRoute';
 import GuestRoute from './routes/GuestRoute';
+import PrivacyPolicy from './PrivacyPolicy/PrivacyPolicy';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -20,6 +20,7 @@ root.render(
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route element={<GuestRoute />}>
         <Route path="guest" element={<App />}>
           <Route index element={<Navigate to="/guest/todos" replace />} />
@@ -45,4 +46,3 @@ root.render(
     </Routes>
   </HashRouter>
 );
-

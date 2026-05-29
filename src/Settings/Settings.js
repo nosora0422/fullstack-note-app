@@ -5,11 +5,10 @@ import { auth } from "../firebase.config";
 import {
   clearAppMode,
   clearGuestData,
-  clearStorageKeys,
   getAppMode,
   getGuestStorageKey,
-  getUserStorageKey,
 } from "../utils/storage";
+import { deleteAllUserItems, deleteUserItems } from "../services/firestoreService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import Footer from "../shared/Footer/Footer";
@@ -44,22 +43,25 @@ export default function Settings() {
     return <Navigate to="/login" replace />;
   }
 
-  const getCurrentKey = (dataType) => {
+  const clearDataType = async (dataType) => {
     if (isGuest) {
-      return getGuestStorageKey(dataType);
+      localStorage.removeItem(getGuestStorageKey(dataType));
+      window.location.reload();
+      return;
     }
 
-    return getUserStorageKey(user.uid, dataType);
-  };
-
-  const clearDataType = (dataType) => {
-    localStorage.removeItem(getCurrentKey(dataType));
+    await deleteUserItems(user.uid, dataType);
     window.location.reload();
   };
 
-  const clearAllCurrentData = () => {
-    const keys = DATA_TYPES.map(({ type }) => getCurrentKey(type));
-    clearStorageKeys(keys);
+  const clearAllCurrentData = async () => {
+    if (isGuest) {
+      clearGuestData();
+      window.location.reload();
+      return;
+    }
+
+    await deleteAllUserItems(user.uid, DATA_TYPES.map(({ type }) => type));
     window.location.reload();
   };
 

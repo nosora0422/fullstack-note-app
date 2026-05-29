@@ -28,7 +28,7 @@ function App() {
   return (
     <div className="mx-auto my-0">
       <div className="my-grid">
-        <div className="col-span-12 md:col-span-3 lg:col-span-2">
+        <div className="col-span-12 md:col-span-3 lg:col-span-2 z-10">
           <Header />
         </div>
         <div className="col-span-12  md:col-span-9 lg:col-span-10">

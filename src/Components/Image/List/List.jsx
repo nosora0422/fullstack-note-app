@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import ImageItems from "../Items/Items";
 import { getLegacyStorageKey, migrateLegacyData, readStorageItems, useScopedStorageKey } from "../../../utils/storage";
+import { addUserItem, deleteUserItem, getUserItems, updateUserItem } from "../../../services/firestoreService";
 
 export default function ImageList({ searchTerm }) {
   const [textVal, setTextVal] = useState('');
@@ -9,32 +10,58 @@ export default function ImageList({ searchTerm }) {
   const [titleVal, setTitleVal] = useState('');
   const [imagePath, setImagePath] = useState('');
   const [categoryVal, setCategoryVal] = useState('Personal');
-  const { key: storageKey, isReady } = useScopedStorageKey("images");
+  const { key: storageKey, isReady, mode, user } = useScopedStorageKey("images");
   const [loadedStorageKey, setLoadedStorageKey] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const isCreateDisabled =
     titleVal.trim() === '' && textVal.trim() === '' && imagePath.trim() === '';
 
-  //get data from localstorage
+  //get data from FireStore or localstorage
   useEffect(() => {
-    if (!isReady || !storageKey) {
-      return;
+    if (!isReady) {
+        return;
     }
 
-    migrateLegacyData(getLegacyStorageKey("images"), storageKey);
-    setItems(readStorageItems(storageKey));
-    setLoadedStorageKey(storageKey);
-  }, [isReady, storageKey]);
+    const loadItems = async () => {
+        setIsLoading(true);
+        setLoadError("");
+
+        try {
+            if (mode === "guest") {
+                migrateLegacyData(getLegacyStorageKey("images"), storageKey);
+                setItems(readStorageItems(storageKey));
+                setLoadedStorageKey(storageKey);
+                return;
+            }
+
+            if (mode === "user" && user) {
+                const firestoreItems = await getUserItems(user.uid, "images");
+                setItems(firestoreItems);
+                setLoadedStorageKey(storageKey);
+            }
+        } catch (error) {
+            console.error("Failed to load images:", error);
+            setLoadError("Could not load images. Please try refreshing the page.");
+            setItems([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    loadItems();
+}, [isReady, storageKey, mode, user]);
 
   //save data to localstorage whenver items updated
   useEffect(() => {
-    if (!isReady || !storageKey || loadedStorageKey !== storageKey) {
+    if (mode !== "guest" || !isReady || !storageKey || loadedStorageKey !== storageKey) {
       return;
     }
 
     localStorage.setItem(storageKey, JSON.stringify(items));
-  }, [items, isReady, storageKey, loadedStorageKey]);
+  }, [items, isReady, storageKey, loadedStorageKey, mode]);
 
-  const addItem = () => {
+  const addItem = async () => {
     if (titleVal !== '') {
       const newItem = {
         id: uuidv4(),
@@ -45,6 +72,15 @@ export default function ImageList({ searchTerm }) {
         date: Date.now(),
       };
 
+      if (mode === "user" && user) {
+        try {
+          await addUserItem(user.uid, "images", newItem);
+        } catch (error) {
+          console.error("Failed to add image:", error);
+          return;
+        }
+      }
+
       setItems([...items, newItem]);
 
       // reset input valuse after adding to the local storage
@@ -54,13 +90,31 @@ export default function ImageList({ searchTerm }) {
     }
   };
 
-  const deleteItem = (key) => {
+  const deleteItem = async (key) => {
+    if (mode === "user" && user) {
+      try {
+        await deleteUserItem(user.uid, "images", key);
+      } catch (error) {
+        console.error("Failed to delete image:", error);
+        return;
+      }
+    }
+
     setItems((currentItems) => currentItems.filter((item) => {
       return item.id !== key;
     }));
   };
 
-  const updateItem = (updatedItem) => {
+  const updateItem = async (updatedItem) => {
+    if (mode === "user" && user) {
+      try {
+        await updateUserItem(user.uid, "images", updatedItem);
+      } catch (error) {
+        console.error("Failed to update image:", error);
+        return;
+      }
+    }
+
     setItems((currentItems) => currentItems.map((item) => {
       return item.id === updatedItem.id ? updatedItem : item;
     }));
@@ -148,19 +202,25 @@ export default function ImageList({ searchTerm }) {
           </div>
         </div>
         <div className="col-span-12 lg:col-span-8">
-          <ImageItems
-            entries={items.filter((item) => {
-              const searchResult = searchTerm.toLowerCase();
-              // Check if searchText is in title or any task text
-              return (
-                (item.title &&
-                  item.title.toLowerCase().includes(searchResult)) ||
-                (item.note && item.note.toLowerCase().includes(searchResult))
-              );
-            })}
-            delRef={deleteItem}
-            updateRef={updateItem}
-          />
+          {isLoading ? (
+            <p className="w-full py-4 px-6 rounded-md -bg--surface-bright">Loading images...</p>
+          ) : loadError ? (
+            <p className="w-full py-4 px-6 rounded-md -bg--surface-bright">{loadError}</p>
+          ) : (
+            <ImageItems
+              entries={items.filter((item) => {
+                const searchResult = searchTerm.toLowerCase();
+                // Check if searchText is in title or any task text
+                return (
+                  (item.title &&
+                    item.title.toLowerCase().includes(searchResult)) ||
+                  (item.note && item.note.toLowerCase().includes(searchResult))
+                );
+              })}
+              delRef={deleteItem}
+              updateRef={updateItem}
+            />
+          )}
         </div>
       </div>
     </div>

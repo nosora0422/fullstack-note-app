@@ -6,36 +6,63 @@ import { faSquare as regularSquare } from '@fortawesome/free-regular-svg-icons';
 import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getLegacyStorageKey, migrateLegacyData, readStorageItems, useScopedStorageKey } from "../../../utils/storage";
 import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
+import { addUserItem, deleteUserItem, getUserItems, updateUserItem } from "../../../services/firestoreService";
 
 export default function List({ searchTerm }){
     const [taskValues, setTaskValues] = useState(['']);
     const [items, setItems] = useState([]);
     const [titleVal, setTitleVal] = useState('');
     const [categoryVal, setCategoryVal] = useState('personal');
-    const { key: storageKey, isReady } = useScopedStorageKey("todos");
+    const { key: storageKey, isReady, mode, user } = useScopedStorageKey("todos");
     const [loadedStorageKey, setLoadedStorageKey] = useState(null);
     const [pendingTaskDeleteIndex, setPendingTaskDeleteIndex] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState("");
     const isCreateDisabled = titleVal.trim() === '' && taskValues.every((task) => task.trim() === '');
 
-    //get data from localstorage
-    useEffect(()=>{
-        if (!isReady || !storageKey) {
+    //get data from FireStore or localstorage
+    useEffect(() => {
+        if (!isReady) {
             return;
         }
 
-        migrateLegacyData(getLegacyStorageKey("todos"), storageKey);
-        setItems(readStorageItems(storageKey));
-        setLoadedStorageKey(storageKey);
-    },[isReady, storageKey]);
+        const loadItems = async () => {
+            setIsLoading(true);
+            setLoadError("");
+
+            try {
+                if (mode === "guest") {
+                    migrateLegacyData(getLegacyStorageKey("todos"), storageKey);
+                    setItems(readStorageItems(storageKey));
+                    setLoadedStorageKey(storageKey);
+                    return;
+                }
+
+                if (mode === "user" && user) {
+                    const firestoreItems = await getUserItems(user.uid, "todos");
+                    setItems(firestoreItems);
+                    setLoadedStorageKey(storageKey);
+                }
+            } catch (error) {
+                console.error("Failed to load to-dos:", error);
+                setLoadError("Could not load to-do lists. Please try refreshing the page.");
+                setItems([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadItems();
+    }, [isReady, storageKey, mode, user]);
 
     //save data to localstorage whenever items updated
     useEffect(() => {
-        if (!isReady || !storageKey || loadedStorageKey !== storageKey) {
+        if (mode !== "guest" || !isReady || !storageKey || loadedStorageKey !== storageKey) {
             return;
         }
 
         localStorage.setItem(storageKey, JSON.stringify(items));
-    }, [items, isReady, storageKey, loadedStorageKey]);
+    }, [items, isReady, storageKey, loadedStorageKey, mode]);
 
     //update taskValues obtained from input
     const handleTaskChange = (index, value) => {
@@ -64,7 +91,7 @@ export default function List({ searchTerm }){
         setPendingTaskDeleteIndex(null);
     };
 
-    const addItem = () => {
+    const addItem = async () => {
         if (titleVal !== ""){
             // create task array with own ids
             const tasksArray = taskValues.map((taskText) => ({
@@ -80,6 +107,15 @@ export default function List({ searchTerm }){
                 date: Date.now()
             };
 
+            if (mode === "user" && user) {
+                try {
+                    await addUserItem(user.uid, "todos", newItem);
+                } catch (error) {
+                    console.error("Failed to add to-do:", error);
+                    return;
+                }
+            }
+
             setItems([...items, newItem]);
 
             // reset input valuse after adding to the local storage
@@ -88,13 +124,31 @@ export default function List({ searchTerm }){
         }
     }
 
-    const deleteItem = (key) =>{
+    const deleteItem = async (key) =>{
+        if (mode === "user" && user) {
+            try {
+                await deleteUserItem(user.uid, "todos", key);
+            } catch (error) {
+                console.error("Failed to delete to-do:", error);
+                return;
+            }
+        }
+
         setItems((currentItems) => currentItems.filter((item) => {
             return item.id !== key;
         }));
     }
 
-    const updateItem = (updatedItem) => {
+    const updateItem = async (updatedItem) => {
+        if (mode === "user" && user) {
+            try {
+                await updateUserItem(user.uid, "todos", updatedItem);
+            } catch (error) {
+                console.error("Failed to update to-do:", error);
+                return;
+            }
+        }
+
         setItems((currentItems) => currentItems.map((item) => {
             return item.id === updatedItem.id ? updatedItem : item;
         }));
@@ -183,18 +237,24 @@ export default function List({ searchTerm }){
                     </div>
                 </div>
                 <div className="col-span-12 lg:col-span-8">
-                    <TodoItems
-                        entries={items.filter((item) => {
-                            const searchResult = searchTerm.toLowerCase();
-                            // Check if searchText is in title or any task text
-                            return (
-                                (item.title && item.title.toLowerCase().includes(searchResult)) ||
-                                (item.tasks && item.tasks.some((task) => task.task.toLowerCase().includes(searchResult)))
-                            );
-                        })}
-                        delRef={deleteItem}
-                        updateRef={updateItem}
-                    />
+                    {isLoading ? (
+                        <p className="w-full py-4 px-6 rounded-md -bg--surface-bright">Loading to-do lists...</p>
+                    ) : loadError ? (
+                        <p className="w-full py-4 px-6 rounded-md -bg--surface-bright">{loadError}</p>
+                    ) : (
+                        <TodoItems
+                            entries={items.filter((item) => {
+                                const searchResult = searchTerm.toLowerCase();
+                                // Check if searchText is in title or any task text
+                                return (
+                                    (item.title && item.title.toLowerCase().includes(searchResult)) ||
+                                    (item.tasks && item.tasks.some((task) => task.task.toLowerCase().includes(searchResult)))
+                                );
+                            })}
+                            delRef={deleteItem}
+                            updateRef={updateItem}
+                        />
+                    )}
                 </div>
             </div>
         </div>

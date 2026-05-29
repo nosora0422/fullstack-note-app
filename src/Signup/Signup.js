@@ -164,6 +164,11 @@ export default function Signup(){
                 >
                     Cancel
                 </Link>
+                <div className="mt-4 text-center">
+                    <Link to="/privacy-policy" className="-text--main-font-color underline">
+                        Privacy Policy
+                    </Link>
+                </div>
             </div>
         </div>
     )

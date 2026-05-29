@@ -10,8 +10,11 @@ import { clearAppMode, clearGuestData, getAppMode } from "../../utils/storage";
 
 export default function Header(){
     const [isNavOpen, setIsNavOpen] = useState(false);
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState(null);
     const navigate = useNavigate();
+    const cRoute = useLocation();
+    const isGuest = cRoute.pathname.startsWith('/guest') || getAppMode() === "guest";
+    const displayName = isGuest ? "Guest" : user?.displayName || "Guest";
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -21,8 +24,6 @@ export default function Header(){
     }, []);
 
     const logout = async () => {
-        const isGuest = cRoute.pathname.startsWith('/guest') || getAppMode() === "guest";
-
         if (isGuest) {
             clearGuestData();
             clearAppMode();
@@ -39,8 +40,7 @@ export default function Header(){
         setIsNavOpen(prev => !prev);
     }
     
-    const cRoute = useLocation();
-    const navBase = cRoute.pathname.startsWith('/guest') || getAppMode() === "guest" ? "/guest" : "/app";
+    const navBase = isGuest ? "/guest" : "/app";
     const todosPath = `${navBase}/todos`;
     const notesPath = `${navBase}/notes`;
     const imagesPath = `${navBase}/images`;
@@ -60,9 +60,6 @@ export default function Header(){
                     <span className="font-medium">Note App</span>
                 </button>
                     <ul id="mobile-navigation" className={isNavOpen ? "mobile-nav-items-open" : "mobile-nav-items"}>
-                        {/* <li className="pb-4 text-right cursor-pointer" onClick={handleMNav}> 
-                            <FontAwesomeIcon icon={faXmark} />
-                        </li> */}
                         <li>
                             <Link to={todosPath} className={(cRoute.pathname === '/app' || cRoute.pathname.endsWith('/todos')) ? 'nav-item-curr' : 'nav-item'}>      
                             <FontAwesomeIcon icon={faListCheck} className="mr-3"/>
@@ -100,7 +97,7 @@ export default function Header(){
             <nav className="fixed top-0 left-0 w-2/12 min-w-[164px] hidden md:flex md:flex-col h-screen py-10 px-4 bg-white drop-shadow-xl">
                 <p className="text-xl">
                     <span aria-hidden="true">👋 </span>
-                    Hi, {user ? user.displayName || "Guest" : "Guest"}!
+                    Hi, {displayName}!
                 </p>
                 <p className="text-3xl mb-10">Note App</p>
                 <ul className="flex flex-col flex-grow h-40">

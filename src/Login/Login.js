@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase.config';
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth'
 import { setAppMode } from '../utils/storage';
 import LoginValidation from '../LoginValidation';
 import { getFirebaseAuthErrorMessage, hasValidationErrors } from '../utils/authErrors';
@@ -52,6 +52,19 @@ export default function Login(){
             setError({ form: getFirebaseAuthErrorMessage(error.code) });
             console.log(error.message);
         }
+    };
+
+    const enterAsGuest = async (event) => {
+        event.preventDefault();
+
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.log(error.message);
+        }
+
+        setAppMode("guest");
+        navigate('/guest/todos');
     };
     
     return(
@@ -104,14 +117,14 @@ export default function Login(){
                             {error.form && <p className='mt-4 text-sm text-red-700' role="alert">{error.form}</p>}
                             <button 
                                 type="button"
-                                className='button w-full mt-8 -bg--primary -text--on-primary rounded'
+                                className='button button-primary mt-6'
                                 onClick={login}
                             >
                                 Log in
                             </button>
                             <button
                                 type="button"
-                                className='button w-full mt-4 -bg--primary-container -text--on-primary-container rounded flex items-center justify-center gap-3'
+                                className='button button-secondary mt-4 flex items-center justify-center gap-3'
                                 onClick={loginWithGoogle}
                             >
                                 <img src={googleLogo} alt="" className="w-5 h-5" aria-hidden="true"/>
@@ -122,16 +135,22 @@ export default function Login(){
                     <div className='flex flex-col items-center'>
                         <p className='mt-10'>Don't have an account yet?</p>
                         <Link to='/signup' 
-                            className='button w-full my-4 -bg--primary-container -text--on-primary-container rounded'
+                            className='button button-secondary w-full my-4'
                         >
                             Sign up
                         </Link>
                         <Link
                             to="/guest/todos"
                             className=" -text--main-font-color  underline mt-4"
-                            onClick={() => setAppMode("guest")}
+                            onClick={enterAsGuest}
                         >
                             Enter as a guest
+                        </Link>
+                        <Link
+                            to="/privacy-policy"
+                            className="-text--main-font-color underline mt-4"
+                        >
+                            Privacy Policy
                         </Link>
                     </div>
                 </div>
