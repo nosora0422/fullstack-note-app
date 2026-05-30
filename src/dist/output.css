@@ -964,6 +964,10 @@ a{
   min-height: 100vh;
 }
 
+.min-h-10{
+  min-height: 2.5rem;
+}
+
 .w-2{
   width: 0.5rem;
 }
@@ -1021,6 +1025,14 @@ a{
   cursor: pointer;
 }
 
+.resize-none{
+  resize: none;
+}
+
+.resize-y{
+  resize: vertical;
+}
+
 .list-disc{
   list-style-type: disc;
 }
@@ -1047,10 +1059,6 @@ a{
 
 .items-center{
   align-items: center;
-}
-
-.justify-start{
-  justify-content: flex-start;
 }
 
 .justify-end{
@@ -1428,6 +1436,10 @@ a{
 
 .underline{
   text-decoration-line: underline;
+}
+
+.line-through{
+  text-decoration-line: line-through;
 }
 
 .opacity-50{

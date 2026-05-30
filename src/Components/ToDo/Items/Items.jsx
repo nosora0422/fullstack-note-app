@@ -271,24 +271,27 @@ function Task({ item, onRequestDelete, onSaveItem }){
                             className={`flex items-start font-normal ${isEditing ? 'bg-white' : ''} rounded-md ${isEditing ? 'py-2': 'py-1'} px-4 `}
                             key={task.id || index}
                         >
-                            <button
-                                type="button"
-                                className="mr-2 p-0 border-0 bg-transparent -text--secondary shrink-0 cursor-pointer"
-                                onClick={() => toggleIcon(index)}
-                                aria-pressed={isChecked[index]}
-                                aria-label={`${isChecked[index] ? 'Mark incomplete' : 'Mark complete'}: ${task.task || `task ${index + 1}`}`}
-                            >
-                                <FontAwesomeIcon icon={isChecked[index] ? checked : unchecked} aria-hidden="true" />
-                            </button>
+                            
                             {isEditing ? (
-                                <div className="w-full flex items-center rounded-sm">
-                                    <input
-                                        aria-label={`Edit task ${index + 1}`}
-                                        className="w-full border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none"
-                                        value={task.task}
-                                        onChange={(event) => handleTaskChange(index, event.target.value)}
-                                        placeholder="Enter Task"
-                                    />
+                                <div className="w-full flex items-center gap-2">
+                                    <div className="flex w-full items-start">
+                                        <button
+                                            type="button"
+                                            className="mr-2 p-0 border-0 bg-transparent -text--secondary shrink-0 cursor-pointer"
+                                            onClick={() => toggleIcon(index)}
+                                            aria-pressed={isChecked[index]}
+                                            aria-label={`${isChecked[index] ? 'Mark incomplete' : 'Mark complete'}: ${task.task || `task ${index + 1}`}`}
+                                        >
+                                            <FontAwesomeIcon icon={isChecked[index] ? checked : unchecked} aria-hidden="true" size="32"/>
+                                        </button>
+                                        <textarea
+                                            aria-label={`Edit task ${index + 1}`}
+                                            className={`w-full min-h-10 resize-none border-0 rounded-sm focus:border-transparent focus:ring-0 focus:outline-none focus-visible:outline-none ${isChecked[index] ? '-text--secondary line-through' : ''}`}
+                                            value={task.task}
+                                            onChange={(event) => handleTaskChange(index, event.target.value)}
+                                            placeholder="Enter Task"
+                                        />
+                                    </div>
                                     <button
                                         type="button"
                                         className="button-icon"
@@ -299,7 +302,18 @@ function Task({ item, onRequestDelete, onSaveItem }){
                                     </button>
                                 </div>
                             ) : (
-                                <span>{task.task}</span>
+                                <>
+                                    <button
+                                        type="button"
+                                        className="mr-2 p-0 border-0 bg-transparent -text--secondary shrink-0 cursor-pointer"
+                                        onClick={() => toggleIcon(index)}
+                                        aria-pressed={isChecked[index]}
+                                        aria-label={`${isChecked[index] ? 'Mark incomplete' : 'Mark complete'}: ${task.task || `task ${index + 1}`}`}
+                                    >
+                                        <FontAwesomeIcon icon={isChecked[index] ? checked : unchecked} aria-hidden="true" size="32"/>
+                                    </button>
+                                    <span className={`${isChecked[index] ? '-text--secondary line-through' : ''}`}>{task.task}</span>
+                                </>
                             )}
                         </li>
                     ))}
